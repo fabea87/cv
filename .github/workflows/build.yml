@@ -63,7 +63,19 @@ jobs:
             CV.pdf
             CV-cn.pdf
 
-      - name: Release PDFs
+      - name: Publish Latest Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest CV PDFs"
+          body: "Automated build of Curriculum Vitae (XeLaTeX) generated on push to `main`."
+          prerelease: false
+          files: |
+            CV.pdf
+            CV-cn.pdf
+
+      - name: Release Tagged PDFs
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
