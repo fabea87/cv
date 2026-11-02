@@ -1,0 +1,72 @@
+name: Build LaTeX CV
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache external fonts
+        id: font-cache
+        uses: actions/cache@v4
+        with:
+          path: .fonts
+          key: cv-external-fonts-v1
+
+      - name: Download PT Sans & Noto Serif SC
+        if: steps.font-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .fonts
+
+          # Download PT Sans (Regular, Bold, Italic, BoldItalic)
+          for variant in Regular Bold Italic BoldItalic; do
+            curl -fsSL "https://raw.githubusercontent.com/google/fonts/main/ofl/ptsans/PT_Sans-Web-${variant}.ttf" \
+              -o ".fonts/PT_Sans-Web-${variant}.ttf"
+          done
+
+          # Download Noto Serif SC (OTF)
+          curl -fsSL "https://github.com/notofonts/noto-cjk/releases/download/Serif2.003/14_NotoSerifSC.zip" \
+            -o notoserifsc.zip
+          unzip -q -j notoserifsc.zip "SubsetOTF/SC/NotoSerifSC-*.otf" -d .fonts/
+          rm -f notoserifsc.zip
+
+      - name: Compile LaTeX documents (XeLaTeX)
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: |
+            CV.tex
+            CV-cn.tex
+          latexmk_use_xelatex: true
+          extra_fonts: |
+            fonts/*.ttf
+            .fonts/*.ttf
+            .fonts/*.otf
+
+      - name: Upload PDF artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-pdfs
+          path: |
+            CV.pdf
+            CV-cn.pdf
+
+      - name: Release PDFs
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            CV.pdf
+            CV-cn.pdf
