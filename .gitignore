@@ -6,6 +6,9 @@ sync.ffs_db
 # CI and local font cache
 .fonts/
 
+# Compiled output documents
+*.pdf
+
 # LaTeX auxiliary and build files
 *.aux
 *.bbl
