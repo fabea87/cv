@@ -24,7 +24,6 @@ sync.ffs_db
 *.log
 *.nav
 *.out
-*.pdf
 *.run.xml
 *.snm
 *.synctex

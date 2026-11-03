@@ -75,6 +75,19 @@ jobs:
             CV.pdf
             CV-cn.pdf
 
+      - name: Commit and push updated PDFs to repository
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add CV.pdf CV-cn.pdf
+          if git diff --staged --quiet; then
+            echo "No PDF changes to commit."
+          else
+            git commit -m "chore(ci): update compiled PDFs [skip ci]"
+            git push
+          fi
+
       - name: Release Tagged PDFs
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
