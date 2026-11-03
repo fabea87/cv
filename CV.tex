@@ -32,19 +32,22 @@
 \newcommand{\myname}{Da ``Alex'' Yan\Large{, Ph.D.}}
 
 % select default typefaces
-\setmainfont{Roboto}[
+\setmainfont{PTSansNarrow}[
   Path = fonts/,
   Extension = .ttf,
   Ligatures = TeX,
+  Scale = 1.1,
   UprightFont = *-Regular,
   BoldFont = *-Bold,
-  ItalicFont = *-Italic,
-  BoldItalicFont = *-BoldItalic
+  ItalicFont = *-Regular,
+  BoldItalicFont = *-Bold,
+  AutoFakeSlant = 0.2
 ]
 \newfontfamily\headingfont{Oswald}[
   Path = fonts/,
   Extension = .ttf,
   Ligatures = TeX,
+  Scale = 1.1,
   UprightFont = *-Regular,
   BoldFont = *-Bold,
   SemiBoldFont = *-SemiBold,
@@ -58,8 +61,8 @@
 \newcommand{\namefont}[1]{{\headingfont\bfseries\Huge\color{cvaccent}{#1}}}
 
 % set page margins (assumes letter paper)
-\geometry{left=0.8in, right= 0.7in,
-top=0.8in, bottom=0.8in}
+\geometry{left=0.68in, right=0.62in,
+top=0.65in, bottom=0.65in}
 
 % prevent paragraph indentation
 \setlength\parindent{0em}
@@ -80,7 +83,7 @@ top=0.8in, bottom=0.8in}
   \textcolor{cvaccent}{%
     \rule[0.55ex]{\listtabwidth}{0.85pt}%
     \hspace{0.6em}%
-    {\headingfont\bfseries\large\ifnum\value{cvsection}<10 0\fi\arabic{cvsection}\hspace{0.5em}#1}%
+    {\headingfont\bfseries\large\ifnum\value{cvsection}<10 0\fi\arabic{cvsection}\hspace{0.5em}\MakeUppercase{#1}}%
     \hspace{0.6em}%
     \leaders\hrule height \dimexpr 0.55ex + 0.85pt\relax depth -0.55ex\hfill\kern0pt
   }\par
@@ -310,11 +313,11 @@ top=0.8in, bottom=0.8in}
 
 \cvsection{Taught Courses}
 \noindent
-{\small\renewcommand{\arraystretch}{0.88}%
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lllc@{}}
-  \toprule
+{\small\renewcommand{\arraystretch}{1.15}%
+\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}ccc@{}}
   \textbf{Course Title} & \textbf{Institution} & \textbf{Code} & \textbf{Offered} \\
-  \midrule
+  \hline
+  \addlinespace[0.45em]
   General Medical English I & WMU & --- & 2026 \\
   English Writing I & WMU & --- & 2026 \\
   College English 1 & WMU & --- & 2025 \\
@@ -328,7 +331,6 @@ top=0.8in, bottom=0.8in}
   Business Negotiation & XYAFU & 07030 & 2014 \\
   College English & XYAFU & 07004 & 2013 \\
   English Grammar & XYAFU & 07049 & 2013 \\
-  \bottomrule
 \end{tabular*}}
 
 \cvsection{Public Service}
