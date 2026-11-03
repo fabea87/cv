@@ -26,18 +26,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .fonts
-          key: cv-external-fonts-v1
+          key: cv-external-fonts-v2
 
-      - name: Download PT Sans & Noto Serif SC
+      - name: Download Noto Serif SC
         if: steps.font-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p .fonts
-
-          # Download PT Sans (Regular, Bold, Italic, BoldItalic)
-          for variant in Regular Bold Italic BoldItalic; do
-            curl -fsSL "https://raw.githubusercontent.com/google/fonts/main/ofl/ptsans/PT_Sans-Web-${variant}.ttf" \
-              -o ".fonts/PT_Sans-Web-${variant}.ttf"
-          done
 
           # Download Noto Serif SC (OTF)
           curl -fsSL "https://github.com/notofonts/noto-cjk/releases/download/Serif2.003/14_NotoSerifSC.zip" \

@@ -22,10 +22,9 @@ PDF outputs are automatically compiled via GitHub Actions with XeLaTeX, deployed
 ## Typography & Fonts
 
 - **Bundled Fonts** (located in `fonts/`):
-  - Alegreya Sans SC
-  - Bona Nova SC
+  - **Roboto Condensed**: Document typeface used in `CV.tex` (Regular, Medium, SemiBold, Bold)
+  - **Oswald**: Heading and document title typeface used in `CV.tex`
 - **External / System Fonts** (automatically fetched & cached by CI):
-  - **PT Sans**: Document sans-serif typeface used in `CV.tex`
   - **Noto Serif SC**: Simplified Chinese serif typeface used in `CV-cn.tex`
 
 ## Local Compilation
