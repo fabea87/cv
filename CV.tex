@@ -32,12 +32,23 @@
 \newcommand{\myname}{Da ``Alex'' Yan\Large{, Ph.D.}}
 
 % select default typefaces
-\setmainfont{PT Sans}
-\newfontfamily\headingfont{Alegreya Sans SC}[
-  Path=fonts/,
-  Ligatures=TeX,
-  UprightFont=AlegreyaSansSC-Regular.ttf,
-  BoldFont=AlegreyaSansSC-Bold.ttf
+\setmainfont{Roboto}[
+  Path = fonts/,
+  Extension = .ttf,
+  Ligatures = TeX,
+  UprightFont = *-Regular,
+  BoldFont = *-Bold,
+  ItalicFont = *-Italic,
+  BoldItalicFont = *-BoldItalic
+]
+\newfontfamily\headingfont{Oswald}[
+  Path = fonts/,
+  Extension = .ttf,
+  Ligatures = TeX,
+  UprightFont = *-Regular,
+  BoldFont = *-Bold,
+  SemiBoldFont = *-SemiBold,
+  MediumFont = *-Medium
 ]
 
 % how far to tab for list items with left-aligned date: different fonts need different widths
