@@ -54,7 +54,7 @@
 ]
 
 % how far to tab for list items with left-aligned date: different fonts need different widths
-\newcommand{\listtabwidth}{1.85cm}
+\newcommand{\listtabwidth}{1.25cm}
 
 % define font to use as document's title
 \newcommand{\namefont}[1]{{\headingfont\bfseries\Huge\color{cvaccent}{#1}}}
@@ -177,6 +177,11 @@ top=0.58in, bottom=0.58in}
 
 
 \cvsection{Appointments}
+
+% slightly wider tab for year ranges (e.g. 2025--26)
+\renewcommand{\listtabwidth}{1.65cm}
+\TabPositions{\listtabwidth}
+\setlist[tablist]{leftmargin=\listtabwidth}
 
 \begin{tablist}
 \item[2026--]\tab{}\textbf{Research Associate Professor} at Wenzhou Medical University
