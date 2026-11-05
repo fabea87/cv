@@ -64,23 +64,22 @@
   MediumFont = *-Medium
 ]
 
-% CJK heading face: 汇文正楷 (Huiwen ZhengKai). Single Regular weight, so fake
-% bold supplies the \bfseries used by \namefont and the section headings.
-% The TTF is NOT in git (personal-use licence, no redistribution) -> falls back to
-% the vendored FZYTK / 方正姚体 when it is absent, e.g. in CI.
-\IfFileExists{fonts/HuiwenZhengKai.ttf}{%
-  \newCJKfontfamily\cjkheadingfont{HuiwenZhengKai}[
-    Path = fonts/,
-    Extension = .ttf,
-    AutoFakeBold = 2.0
-  ]%
-}{%
-  \newCJKfontfamily\cjkheadingfont{FZYTK}[
-    Path = fonts/,
-    Extension = .ttf,
-    AutoFakeBold = 2.5
-  ]%
+% CJK heading face: 汇文正楷 (Huiwen ZhengKai), the ONLY CJK heading face.
+% Single Regular weight, so fake bold supplies the \bfseries used by \namefont
+% and the section headings. The TTF is NOT in git (personal-use licence, no
+% redistribution), so it must be supplied at build time: locally by dropping
+% fonts/HuiwenZhengKai.ttf into place, in CI by the HUIWEN_FONT_B64 secret.
+% There is deliberately NO fallback font -- a missing file is a hard error.
+\IfFileExists{fonts/HuiwenZhengKai.ttf}{}{%
+  \errmessage{*** CV-cn.tex requires fonts/HuiwenZhengKai.ttf (\string\cjkheadingfont)
+    -- 汇文正楷 is not distributed with this repo. Place the TTF in fonts/ (local)
+    or set the HUIWEN_FONT_B64 repository secret (CI). ***}%
 }
+\newCJKfontfamily\cjkheadingfont{HuiwenZhengKai}[
+  Path = fonts/,
+  Extension = .ttf,
+  AutoFakeBold = 2.0
+]
 
 % what is your name?
 \newcommand{\myname}{闫\hspace{0.5em}达\texorpdfstring{\Large{ 博士}}{ 博士}}
