@@ -6,6 +6,9 @@ sync.ffs_db
 # CI and local font cache
 .fonts/
 
+# Personal-use licensed font (汇文正楷): no redistribution, not committed
+fonts/HuiwenZhengKai.ttf
+
 # Compiled output documents
 *.pdf
 

@@ -24,16 +24,33 @@ PDF outputs are automatically compiled via GitHub Actions with XeLaTeX, deployed
 - **Bundled Fonts** (located in `fonts/`):
   - **Roboto Condensed**: Document typeface used in `CV.tex` (Regular, Medium, SemiBold, Bold)
   - **Oswald**: Heading and document title typeface used in `CV.tex`
-- **External / System Fonts** (automatically fetched & cached by CI):
-  - **Noto Serif SC**: Simplified Chinese serif typeface used in `CV-cn.tex`
+  - **FZYTK / 方正姚体**: CJK heading fallback in `CV-cn.tex`
+- **External / System Fonts**:
+  - **Noto Serif CJK SC**: Simplified Chinese body serif in `CV-cn.tex`. Install with
+    `brew install font-noto-serif-cjk-sc`; CI fetches the static Regular + Bold OTFs.
+  - **汇文正楷 (Huiwen ZhengKai)**: CJK heading face in `CV-cn.tex`. **Not committed**
+    (personal-use licence, no redistribution). Drop `HuiwenZhengKai.ttf` into `fonts/`
+    to use it locally; otherwise the file-existence check silently falls back to FZYTK,
+    which is also what CI builds.
+
+> `CV-cn.tex` deliberately uses the **static** Noto Serif CJK SC family. The variable
+> `Noto Serif SC` (`NotoSerifSC[wght].ttf`) has no separate bold face, and XeTeX ignores
+> its `wght` axis — a bold request against it renders Regular weight without any error.
+
+### Chinese punctuation
+
+`CV-cn.tex` follows APA punctuation with Chinese content: `, . : ; ( )` instead of
+`，。：；（）`, `\textit{}` instead of `《》`, periods inside closing quotes, and `\&`
+before the final author in Chinese reference entries. CJK italics use `FakeSlant`
+(Noto Serif CJK has no italic face).
 
 ## Local Compilation
 
 If compiling locally with XeLaTeX:
 
 ```bash
-latexmk -xelatex CV.tex
-latexmk -xelatex CV-cn.tex
+texliveonfly --compiler=xelatex --terminal_only CV.tex
+texliveonfly --compiler=xelatex --terminal_only CV-cn.tex
 ```
 
 Compiled PDF files (`*.pdf`) and LaTeX auxiliary build files (`.aux`, `.log`, `.out`, etc.) are ignored by git to keep the repository clean and source-only.

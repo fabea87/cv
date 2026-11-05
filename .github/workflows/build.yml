@@ -26,18 +26,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .fonts
-          key: cv-external-fonts-v2
+          key: cv-external-fonts-v3
 
-      - name: Download Noto Serif SC
+      - name: Download Noto Serif CJK SC (static faces)
         if: steps.font-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p .fonts
 
-          # Download Noto Serif SC (OTF)
-          curl -fsSL "https://github.com/notofonts/noto-cjk/releases/download/Serif2.003/14_NotoSerifSC.zip" \
-            -o notoserifsc.zip
-          unzip -q -j notoserifsc.zip "SubsetOTF/SC/NotoSerifSC-*.otf" -d .fonts/
-          rm -f notoserifsc.zip
+          # Static Simplified Chinese OTFs. CV-cn.tex needs the CJK family (real
+          # Bold face); the variable "Noto Serif SC" has no bold instance.
+          for weight in Regular Bold; do
+            curl -fsSL "https://github.com/notofonts/noto-cjk/raw/main/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-${weight}.otf" \
+              -o ".fonts/NotoSerifCJKsc-${weight}.otf"
+          done
 
       - name: Compile LaTeX documents (XeLaTeX)
         uses: xu-cheng/latex-action@v4
