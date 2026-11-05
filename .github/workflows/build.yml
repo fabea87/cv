@@ -61,8 +61,6 @@ jobs:
           ls -l fonts/HuiwenZhengKai.ttf
 
       - name: Download Noto Serif CJK SC (static faces)
-
-      - name: Download Noto Serif CJK SC (static faces)
         if: steps.font-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p .fonts
