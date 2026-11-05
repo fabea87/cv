@@ -4,41 +4,48 @@
 % Web: https://870603.xyz
 % Repo: https://github.com/fabea87/cv
 
-\documentclass[11pt,a4paper]{report}
+\documentclass[12pt,a4paper]{report}
 
-\usepackage[T1]{fontenc}  % output T1 font encoding (8-bit) for accented characters as single glyph
-\usepackage[strict,autostyle]{csquotes} % smart and nestable quote marks
-\usepackage[USenglish]{babel} % regionalize hyphens, quote marks, etc automatically
-\usepackage{graphicx}
-\usepackage{microtype}% improve text appearance with kerning, etc
-\usepackage{datetime} % enable formatting of date output
-\usepackage{tabto}    % smake nice tabbing
-\usepackage{hyperref} % enable hyperlinks and pdf metadata
-\usepackage{geometry} % manually set page margins
-\usepackage{enumitem} % enumerate with [resume] option
-\usepackage{titlesec} % allow custom section fonts
-\usepackage{setspace} % custom line spacing
-\usepackage[dvipsnames]{xcolor}
-\usepackage{multicol}
+\usepackage{fontspec}
 \usepackage{xeCJK}
-\usepackage{sectsty}
-\usepackage{relsize}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{microtype}
+\usepackage{datetime}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{setspace}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{graphicx}
 \usepackage{fontawesome5}
+\usepackage{academicons}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{booktabs}
+\usepackage{array}
 
-\sectionfont{\fontsize{14}{18}\selectfont}
-\subsectionfont{\fontsize{12}{13}\selectfont}
-
-\newcommand{\edittoday}{\number\year 年\number\month 月}
-
-% what is your name?
-\newcommand{\myname}{闫\space\space 达\space\space\space 博士}
+% Accent color: Vibrant Royal Blue (#1A56B2)
+\definecolor{cvaccent}{HTML}{1A56B2}
 
 % select default typefaces
-%\usepackage{ebgaramond} % document's serif typeface
-%\usepackage{tgheros}    % document's sans serif typeface
-\usepackage{libertine}
+\setmainfont{RobotoCondensed}[
+  Path = fonts/,
+  Extension = .ttf,
+  Ligatures = TeX,
+  UprightFont = *-Regular,
+  BoldFont = *-Medium,
+  ItalicFont = *-Italic,
+  BoldItalicFont = *-MediumItalic
+]
+
 \IfFontExistsTF{Noto Serif SC}{%
-  \setCJKmainfont{Noto Serif SC}%
+  \setCJKmainfont{Noto Serif SC}[
+    BoldFont = Noto Serif SC Bold,
+    ItalicFont = Noto Serif SC Light,
+    BoldItalicFont = Noto Serif SC Bold
+  ]%
 }{%
   \IfFontExistsTF{Noto Serif CJK SC}{%
     \setCJKmainfont{Noto Serif CJK SC}%
@@ -47,33 +54,72 @@
   }%
 }
 
-% how far to tab for list items with left-aligned date: different fonts need different widths
+\newfontfamily\headingfont{RobotoCondensed}[
+  Path = fonts/,
+  Extension = .ttf,
+  Ligatures = TeX,
+  Scale = 1.05,
+  UprightFont = *-Regular,
+  BoldFont = *-Bold,
+  SemiBoldFont = *-SemiBold,
+  MediumFont = *-Medium
+]
+
+\IfFileExists{fonts/FZYTK.ttf}{%
+  \newCJKfontfamily\cjkheadingfont{FZYTK}[
+    Path = fonts/,
+    Extension = .ttf,
+    AutoFakeBold = 2.5
+  ]%
+}{%
+  \IfFontExistsTF{方正姚体}{%
+    \newCJKfontfamily\cjkheadingfont{方正姚体}[AutoFakeBold = 2.5]%
+  }{%
+    \newCJKfontfamily\cjkheadingfont{FZYaoTi}[AutoFakeBold = 2.5]%
+  }%
+}
+
+% what is your name?
+\newcommand{\myname}{闫\hspace{0.5em}达\texorpdfstring{\Large{ 博士}}{ 博士}}
+
+% how far to tab for list items with left-aligned date
 \newcommand{\listtabwidth}{1.7cm}
 
 % define font to use as document's title
-\newcommand{\namefont}[1]{{\normalfont\bfseries\Huge{#1}}}
+\newcommand{\namefont}[1]{{\cjkheadingfont\bfseries\Huge\color{cvaccent}{#1}}}
 
-% set section heading fonts and before/after spacing
-\SetTracking{encoding=*, family=\sfdefault}{30} % increase sans serif headings tracking
-\titleformat{\section}{\lsstyle\sffamily\small\bfseries\uppercase}{}{}{}{}
-\titlespacing{\section}{0pt}{30pt plus 4pt minus 4pt}{8pt plus 2pt minus 2pt}
-
-% set subsection heading fonts and before/after spacing
-\titleformat{\subsection}{\lsstyle\sffamily\footnotesize\bfseries}{}{}{}{}
-\titlespacing{\subsection}{0pt}{16pt plus 4pt minus 4pt}{4pt plus 2pt minus 2pt}
-
-% set page margins (assumes letter paper)
-\geometry{left=0.8in, right= 0.7in,
-top=0.8in, bottom=0.8in}
+% set page margins
+\geometry{left=0.62in, right=0.58in, top=0.50in, bottom=0.50in}
 
 % prevent paragraph indentation
 \setlength\parindent{0em}
 
 % set line spacing
-\setstretch{0.9}
+\setstretch{0.82}
 
 % define space between list items
-\newcommand{\listitemspace}{0.25em}
+\newcommand{\listitemspace}{0.12em}
+
+% right-aligned publication tag
+\newcommand{\pubtag}[1]{\hspace*{\fill}\mbox{(#1)}}
+
+% Thoughteer-inspired section heading: colored flanking lines + heading
+\newcounter{cvsection}
+\newcommand{\cvsection}[1]{%
+  \Needspace{6\baselineskip}%
+  \par\vspace{10pt plus 2pt minus 2pt}%
+  \refstepcounter{cvsection}%
+  \noindent
+  \textcolor{cvaccent}{%
+    \rule[0.55ex]{\listtabwidth}{0.85pt}%
+    \hspace{0.6em}%
+    {\headingfont\cjkheadingfont\bfseries\large\ifnum\value{cvsection}<10 0\fi\arabic{cvsection}\hspace{0.5em}#1}%
+    \hspace{0.6em}%
+    \leaders\hrule height \dimexpr 0.55ex + 0.85pt\relax depth -0.55ex\hfill\kern0pt
+  }\par
+  \vspace{0.25em}%
+  \nopagebreak
+}
 
 % make unordered lists without bullets and use compact spacing
 \renewenvironment{itemize}
@@ -85,344 +131,300 @@ top=0.8in, bottom=0.8in}
   {
 \end{list}}
 
-% make tabbed lists so content is left-aligned next to years
-\TabPositions{\listtabwidth}
+% make lists with consistent hanging indent
 \newlist{tablist}{description}{3}
-\setlist[tablist]{leftmargin=\listtabwidth,
-  labelindent=0em,
+\setlist[tablist]{%
+  leftmargin=\listtabwidth,
+  labelwidth=\dimexpr\listtabwidth - 0.15cm\relax,
+  labelsep=0.15cm,
+  itemindent=0pt,
   topsep=0em,
   partopsep=0em,
   itemsep=\listitemspace,
   parsep=\listitemspace,
-font=\normalfont}
+  align=left,
+  font=\normalfont
+}
 
-% print only the month and year when using \today
-\newdateformat{monthyeardate}{\monthname[\THEMONTH] \THEYEAR}
+% make compact enumerated lists
+\setlist[enumerate]{topsep=0.10em, partopsep=0em, itemsep=\listitemspace, parsep=\listitemspace, leftmargin=1.6em, font=\normalfont}
+
+% date format
+\newcommand{\edittoday}{\number\year 年\number\month 月}
 
 % define hyperlink appearance and metadata for pdf properties
 \hypersetup{
   colorlinks  = true,
-  urlcolor    = black,
+  urlcolor    = cvaccent,
   citecolor   = black,
-  linkcolor   = black,
-  pdfauthor   = {\myname},
-  pdfkeywords = {applied linguistics, translation, formative feedback, CALL, GenAI},
-  pdftitle    = {\myname: Curriculum Vitae},
-  pdfsubject  = {Curriculum Vitae},
+  linkcolor   = cvaccent,
+  pdfauthor   = {闫达},
+  pdfkeywords = {应用语言学, 翻译学, 形成性评估, 计算机辅助教学, 人工智能},
+  pdftitle    = {闫达: 个人简历},
+  pdfsubject  = {个人简历},
   pdfpagemode = UseNone
 }
 
+% page footer with update date, name and page numbers
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!70}更新时间：\edittoday}
+\fancyfoot[R]{\footnotesize\color{black!70}闫达 --- 第 \thepage{} / \pageref{LastPage} 页}
+
 \begin{document}
 \raggedright{}
-\relscale{1.15}
 
-% display your name as the document title
-\namefont{\myname}
-
-% affiliation and contact info blocks
-%\vspace{1em}
-\begin{minipage}[t]{0.5\textwidth}
-  \vspace{1em} % Aligns with the top of the image
-  \faUniversity\hspace{0.5em}温州医科大学\\[0.3em]
-  %\hspace{2em}(Universiti Sains Malaysia)\\
-  \faBuilding[regular]\hspace{0.5em}外国语学院\\
-  %(School of Languages, Literacies \& Translation)\\
-  \\[0.3em]
-  \href{mailto:alexyan1987@outlook.com}{\faEnvelope[regular]\hspace{0.5em}alexyan1987@outlook.com}\\[0.3em]
-  \faWhatsapp\hspace{0.5em}+86 185 6980 0613\\[0.3em]
-  \href{https://870603.xyz}{\faInternetExplorer\hspace{0.3em}870603.xyz}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.45\textwidth}
-  \vspace{-15pt} % Aligns with the top of the text
-  \flushright{}
-  \includegraphics[width=\linewidth, height=4cm, keepaspectratio]{photo.jpg}\hspace{1.5em}
+% display your name, institution, contact info and photo
+\begin{minipage}[t]{0.73\textwidth}
+  \vspace{0pt}%
+  \namefont{\myname}\\[0.40em]
+  {\large\faUniversity\hspace{0.35em}温州医科大学}\\[0.22em]
+  {\large\faBuilding[regular]\hspace{0.4em}外国语学院}\\[0.50em]
+  \href{mailto:alexyan1987@outlook.com}{\faEnvelope[regular]\hspace{0.4em}alexyan1987@outlook.com}\hspace{1.4em}%
+  \href{mailto:yanda@wmu.edu.cn}{\faEnvelope[regular]\hspace{0.4em}yanda@wmu.edu.cn}\\[0.30em]
+  \href{tel:+8618569800613}{\faWhatsapp\hspace{0.4em}+86 185 6980 0613}\hspace{1.4em}%
+  \href{https://870603.xyz}{\faGlobe\hspace{0.35em}870603.xyz}\hspace{1.4em}%
+  {\normalsize%
+    \href{https://orcid.org/0000-0002-1265-9772}{\aiOrcid}\hspace{0.35em}%
+    \href{https://scholar.google.com/citations?user=28WTkNkAAAAJ&hl=en}{\aiGoogleScholar}\hspace{0.35em}%
+    \href{https://www.webofscience.com/wos/author/record/AAE-3520-2022}{\aiClarivate}\hspace{0.35em}%
+    \href{https://www.scopus.com/authid/detail.uri?authorId=57192956833}{\aiScopus}%
+  }
+\end{minipage}\hfill
+\begin{minipage}[t]{0.24\textwidth}
+  \vspace{0pt}%
+  \raggedleft
+  \includegraphics[width=2.55cm, height=3.35cm, keepaspectratio]{photo.jpg}
 \end{minipage}
 
-\section*{教育背景}
+\cvsection{教育背景}
 
 \begin{tablist}
-\item[2022--2025]\tab{}\textbf{翻译学\space\space\space\space\; 哲学博士}\space\space \hfill \textbf{马来西亚理科大学}\space\space 语言、文学与翻译学院
-\item[2010--2013]\tab{}\textbf{翻译专业\;  文学硕士}\space\space \hfill \textbf{温州大学}\space\space 外国语学院 \\
-\item[2004--2008]\tab{}\textbf{英语专业\; 文学学士}\space\space \hfill \textbf{河南科技大学}\space\space 外国语学院
+\item[博士] \textbf{翻译学}，马来西亚理科大学 语言、文学与翻译学院，2025
+\item[硕士] \textbf{翻译学}，温州大学 外国语学院，2013
+\item[学士] \textbf{英语专业}，河南科技大学 外国语学院，2008
 \end{tablist}
 
-
-\section*{任职经历}
+\cvsection{任职经历}
 
 \begin{tablist}
-\item[2026 至今]\tab{}于\space\space \textit{}温州医科大学\space\space 担任\space\space \textbf{副研究员}
-\item[2025--2026]\tab{}于\space\space \textit{}温州医科大学外国语学院\space\space 担任\space\space \textbf{讲师}
-
-\item[2020--2025]\tab{}于\space\space \textit{}信阳农林学院外国语学院\space\space 担任\space\space \textbf{讲师}
-
-\item[2013--2020]\tab{}于\space\space 信阳农林学院外国语学院\space\space 担任\space\space \textbf{助教}
-
+\item[2026--] \textbf{副研究员}，温州医科大学
+\item[2025--26] \textbf{讲师}，温州医科大学 外国语学院
+\item[2020--25] \textbf{讲师}，信阳农林学院 外国语学院
+\item[2013--20] \textbf{助教}，信阳农林学院 外国语学院
 \end{tablist}
 
-\section*{研究领域}
+\cvsection{研究方向}
 
-\begin{tablist}
-
-\item[1.] 计算机辅助语言教学，技术增强口笔译训练。
-\item[2.] 教育反馈，形成性评估 (formative assessment)。
-\item[3.] 生成式AI (GenAI) 增强教育反馈，教育环境下的人与GenAI互动。
-
-\end{tablist}
-
-\section*{论文概览}
-\vspace{0.3em}
-
-已发表核心论文共计 21 篇【其中 \textbf{S(S)CI/A\&HCI} 15 篇】；国际会议论文集收录 1 篇； 图书章节一篇。
-
-\section*{科研项目}
-自2014年始，主持省部级及地厅级科研项目共计 15 项。
-
-\section*{工作经验及社会和学术服务}
-\begin{enumerate}
-  \item 自2013年于高校任教以来，承担 \textbf{公共外语}、\textbf{英语专业} 及 \textbf{翻译专业} 的教学工作；获得国家、省、校级奖励共计 5 项。
-  \item 担任多项 国际活动 同声传译。
-  \item 担任 Scientific Reports 等期刊编委/学术编辑，及多本 (30+) SSCI/SCI 期刊特邀评审专家。
+\begin{enumerate}[itemsep=0.04em, parsep=0.04em, topsep=0.08em]
+  \item \textbf{应用语言学}与外语教学法。
+  \item \textbf{计算机辅助语言学习}与口笔译技术培训。
+  \item 二语习得中的教学与\textbf{形成性反馈}。
+  \item \textbf{人机交互}在教育反馈、高等教育与语言教学中的应用。
 \end{enumerate}
 
-\centering\fbox{\textbf{各项具体履历、成果及经验，请见简历后续部分 $\downarrow$}}
-\vspace{0.5em}
-
-\newpage
-\sectionfont{\fontsize{14}{18}\centering\selectfont}
-
-
-\section*{学术成果}
-
-\subsection*{已发表同行评议论文}
+\cvsection{发表论文}
 
 \begin{tablist}
-\item[2026] \tab{}\textbf{Yan, D.*}\enquote{Metacognitive instruction to enhance EFL writers` metacognition, feedback uptake, and revision performance in a GenAI-assisted feedback context} \textit{International Journal of Applied Linguistics},\href{https://doi.org/10.1111/ijal.70328}{doi: 10.1111/ijal.70328} \textbf{[SSCI一区]}
+\item[2026] \textbf{Yan, D.*} Metacognitive instruction to enhance EFL writers' metacognition, feedback uptake, and revision performance in a GenAI-assisted feedback context. \textit{International Journal of Applied Linguistics}. Advance online publication.~\href{https://doi.org/10.1111/ijal.70328}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2026] \tab{}\textbf{Yan, D.*}, Kasuma, S.A.A., \& Amini. M. \enquote{Revisiting Dialogic Feedback in the Age of GenAI: An Investigation Into L2 Writers` Feedback Seeking Interactions} \textit{Generative AI in Education: Theories, Applications, and Ethical Frontiers}, \href{https://doi.org/10.1007/978-981-95-4871-2_14}{doi:10.1007/978-981-95-4871-2\_14} \textbf{[Book Chapter]}
-\item[2026] \tab{}Tian, F., \textbf{Yan, D.}, Umar, IN. \enquote{Bridging Language and Discipline: The Impact of Digital Game-Based Learning on Technical Vocabulary Acquisition and Motivation} \textit{Journal of Educational Computing Research} \href{https://doi.org/10.1177/07356331251414550}{doi: 10.1177/07356331251414550} \textbf{[SSCI一区]}
-\item[2025] \tab{}\textbf{Yan, D.*}, Tian, F., Li, H., Yu. G., \& Li, J. \enquote{A GenAI-supported dialogic model to enhance the functions of peer feedback in EFL writing: a mixed-method interventional study} \textit{System} \href{https://doi.org/10.1016/j.system.2025.103895}{doi: 10.1016/j.system.2025.103895} \textbf{[SSCI一区\textcolor{red}{TOP}]}
+\item[2026] \textbf{Yan, D.*}, Kasuma, S. A. A., \& Amini, M. Revisiting dialogic feedback in the age of GenAI: An investigation into L2 writers' feedback seeking interactions. In \textit{Generative AI in Education: Theories, Applications, and Ethical Frontiers} (pp. 261--281). Springer.~\href{https://doi.org/10.1007/978-981-95-4871-2_14}{\aiDoi} \pubtag{图书章节}
 
-\item[2025] \tab{}\textbf{Yan, D.*}, \& Yu. G. \enquote{Effects of interactive vs. complementary approaches to integrating automated and peer feedback on L2 writers' feedback quality and performance improvement} \textit{Computer Assisted Language Learning} \href{https://doi.org/10.1080/09588221.2025.2569352}{doi: 10.1080/09588221.2025.2569352} \textbf{[SSCI一区\textcolor{red}{TOP}]}
+\item[2026] Tian, F., \textbf{Yan, D.}, \& Umar, I. N. Bridging language and discipline: The impact of digital game-based learning on technical vocabulary acquisition and motivation. \textit{Journal of Educational Computing Research}, \textit{64}(4), 791--820.~\href{https://doi.org/10.1177/07356331251414550}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2025] \tab{}\textbf{Yan, D.*}, Jia. C., \& Tian. F. \enquote{Automated feedback complements online dialogic peer feedback: Fostering L2 writers' feedback quality and self-regulatory writing strategy use} \textit{Interactive Learning Environments} \href{https://doi.org/10.1080/10494820.2025.2491620}{doi:10.1080/10494820.2025.2491620} \textbf{[SSCI一区]}
-\item[2025] \tab{}\textbf{Yan, D.}, \& Jia. C.* \enquote{Occupational stress and turnover intentions among simultaneous interpreters: the mediating role of burnout and the moderating role of grit} \textit{Perspectives: Studies in Translation Theory and Practice} \href{https://doi.org/10.1080/0907676X.2025.2478403}{doi:10.1080/0907676X.2025.2478403} \textbf{[A\&HCI；SSCI二区]}
+\item[2025] \textbf{Yan, D.*}, Tian, F., Li, H., Yu, G., \& Li, J. A GenAI-supported dialogic model to enhance the functions of peer feedback in EFL writing: A mixed-method interventional study. \textit{System}, \textit{136}, Article 103895.~\href{https://doi.org/10.1016/j.system.2025.103895}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2024] \tab{}\textbf{Yan, D.} \enquote{Comparing individual vs. collaborative processing of ChatGPT-generated feedback: effects on L2 writing task improvement and learning} \textit{Language Learning \& Technology.} \href{https://hdl.handle.net/10125/73597}{handle:10125/73597} \textbf{[SSCI一区]}
+\item[2025] \textbf{Yan, D.*}, \& Yu, G. Effects of interactive vs. complementary approaches to integrating automated and peer feedback on L2 writers' feedback quality and performance improvement. \textit{Computer Assisted Language Learning}. Advance online publication, 1--24.~\href{https://doi.org/10.1080/09588221.2025.2569352}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2024] \tab{}\textbf{Yan, D.}, \& Zhang, S.* \enquote{L2 writer engagement with automated written corrective feedback provided by ChatGPT: A mixed method multiple case study} \textit{Humanities and Social Sciences Communications}.
-  \href{https://doi.org/10.1057/s41599-024-03543-y}{doi:10.1057/s41599-024-03543-y}
-  \textbf{[SSCI一区；A\&HCI]}
+\item[2025] \textbf{Yan, D.*}, Jia, C., \& Tian, F. Automated feedback complements online dialogic peer feedback: Fostering L2 writers' feedback quality and self-regulatory writing strategy use. \textit{Interactive Learning Environments}, \textit{33}(10), 6021--6035.~\href{https://doi.org/10.1080/10494820.2025.2491620}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2024] \tab{}\textbf{Yan, D.} \enquote{Rubric co-creation to promote quality, interactivity, and uptake of peer feedback} \textit{Assessment \& Evaluation in Higher Education}, Advance online publication. \href{https://doi.org/10.1080/02602938.2024.2333005}{doi:10.1080/02602938.2024.2333005} \textbf{[SSCI一区\textcolor{red}{TOP}]}
+\item[2025] \textbf{Yan, D.}, \& Jia, C.* Occupational stress and turnover intentions among simultaneous interpreters: The mediating role of burnout and the moderating role of grit. \textit{Perspectives: Studies in Translation Theory and Practice}, \textit{34}(5), 1025--1040.~\href{https://doi.org/10.1080/0907676X.2025.2478403}{\aiDoi} \pubtag{A\&HCI、SSCI二区}
 
-\item[2024] \tab{}\textbf{Yan, D.} \enquote{Feedback seeking abilities of L2 writers using ChatGPT: a mixed method multiple case study} \textit{Kybernetes}, \href{https://doi.org/10.1108/K-09-2023-1933}{doi:10.1108/K-09-2023-1933} \textbf{[SCI二区]}
+\item[2024] \textbf{Yan, D.} Comparing individual vs. collaborative processing of ChatGPT-generated feedback: Effects on L2 writing task improvement and learning. \textit{Language Learning \& Technology}, \textit{28}(1), 1--19.~\href{https://doi.org/10.64152/10125/73597}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SSCI一区}
 
-\item[2023] \tab{}\textbf{Yan, D.}, Kasuma, S.A.A.*, \& Amini. M. \enquote{Status Quo of the Formative Assessment Enactments in Spoken Language Interpreter Training: A Scoping Review of Research and Practice} \textit{International Journal of Academic Research in Progressive Education and Development}, 12 (4), 652-673. \href{https://doi.org/10.6007/IJARPED/v12-i4/19884}{doi:10.6007/IJARPED/v12-i4/19884}
-  \textbf{[ERA]}
+\item[2024] \textbf{Yan, D.}, \& Zhang, S.* L2 writer engagement with automated written corrective feedback provided by ChatGPT: A mixed method multiple case study. \textit{Humanities and Social Sciences Communications}, \textit{11}(1), Article 1086.~\href{https://doi.org/10.1057/s41599-024-03543-y}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SSCI一区、A\&HCI}
 
-\item[2023] \tab{}\textbf{Yan, D.}, Kasuma, S.A.A.*,\& Amini. M. \enquote{Gender Difference in Digital Literacy Among Translation Trainees: Self-perceptions and Application Abilities} \textit{International Journal of Academic Research in Progressive Education and Development}, 12 (3), 2393-2899. \href{https://doi.org/10.6007/IJARPED/v12-i3/19611}{doi:10.6007/IJARPED/v12-i3/19611}
-  \textbf{[ERA]}
+\item[2024] \textbf{Yan, D.} Rubric co-creation to promote quality, interactivity, and uptake of peer feedback. \textit{Assessment \& Evaluation in Higher Education}, \textit{49}(8), 1017--1034.~\href{https://doi.org/10.1080/02602938.2024.2333005}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2023] \tab{}Gong, H. \& \textbf{Yan, D.*} \enquote{The impact of Danmaku-based and synchronous peer feedback on L2 oral performance: A mixed-method investigation} \textit{PLoS One}, 18 (4), e0284843. \href{https://doi.org/10.1371/journal.pone.0284843}{doi:10.1371/journal.pone.0284843} \textbf{[SCI一区]}
+\item[2024] \textbf{Yan, D.} Feedback seeking abilities of L2 writers using ChatGPT: A mixed method multiple case study. \textit{Kybernetes}, \textit{54}(7), 3757--3781.~\href{https://doi.org/10.1108/K-09-2023-1933}{\aiDoi} \pubtag{SCI二区}
 
-\item[2023] \tab{}\textbf{Yan, D.} \enquote{Impact of ChatGPT on learners in a L2 writing practicum: An exploratory investigation} \textit{Education and Information Technologies}, 28, 13943-13967. \href{https://doi.org/10.1007/s10639-023-11742-4}{doi:10.1007/s10639-023-11742-4} \textbf{[SSCI一区]}
+\item[2023] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. Gender difference in digital literacy among translation trainees: Self-perceptions and application abilities. \textit{International Journal of Academic Research in Progressive Education and Development}, \textit{12}(3), 2393--2899.~\href{https://doi.org/10.6007/IJARPED/v12-i3/19611}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{ERA}
 
-\item[2022] \tab{}\textbf{Yan, D.} \& Fan, Q.* \enquote{Online informal learning community for interpreter training amid COVID-19: A pilot evaluation} \textit{PLoS One}, 17 (11), e0277228. \href{https://doi.org/10.1371/journal.pone.0277228}{doi:10.1371/journal.pone.0277228} \textbf{[SCI一区]}
+\item[2023] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. Status quo of the formative assessment enactments in spoken language interpreter training: A scoping review of research and practice. \textit{International Journal of Academic Research in Progressive Education and Development}, \textit{12}(4), 652--673.~\href{https://doi.org/10.6007/IJARPED/v12-i4/19884}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{ERA}
 
-\item[2022] \tab{}\textbf{Yan, D.} \& Wang, J.* \enquote{Teaching data science to undergraduate translation trainees: Pilot evaluation of a task-based course} \textit{Frontiers in Psychology}, 13, 939689.\textbf{[SSCI一区]}
+\item[2023] Gong, H., \& \textbf{Yan, D.*} The impact of Danmaku-based and synchronous peer feedback on L2 oral performance: A mixed-method investigation. \textit{PLOS ONE}, \textit{18}(4), Article e0284843.~\href{https://doi.org/10.1371/journal.pone.0284843}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SCI一区}
 
-\item[2018] \tab{}杨明星，吴丽华，牛桂玲，\textbf{闫达.} \enquote{『互联网+』背景下多模态、多语种 外交话语平行语料库设计与创建探析} \textit{外语教学}, 39(6), 13-19. \textbf{[CSSCI]}
+\item[2023] \textbf{Yan, D.} Impact of ChatGPT on learners in a L2 writing practicum: An exploratory investigation. \textit{Education and Information Technologies}, \textit{28}(11), 13943--13967.~\href{https://doi.org/10.1007/s10639-023-11742-4}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2016] \tab{}Yang, M. \& \textbf{Yan, D.} \enquote{The translation strategies for Chinese diplomatic neologisms from the perspective of "Political Equivalence"} \textit{Babel. Revue Internationale de La Traduction / International Journal of Translation}, 62(4), 661–675.\href{https://doi.org/10.1075/babel.62.4.07yan}{doi:10.1075/babel.62.4.07yan} \textbf{[SSCI三区；A\&HCI]}
+\item[2022] \textbf{Yan, D.}, \& Fan, Q. Online informal learning community for interpreter training amid COVID-19: A pilot evaluation. \textit{PLOS ONE}, \textit{17}(11), Article e0277228.~\href{https://doi.org/10.1371/journal.pone.0277228}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SCI一区}
 
-\item[2013] \tab{}杨明星，\textbf{闫达.} \enquote{现代信息技术条件下外交机辅翻译模型研究初探} \textit{外语电化教学}, 2013(3), 33-41. \textbf{[CSSCI]}
+\item[2022] \textbf{Yan, D.}, \& Wang, J. Teaching data science to undergraduate translation trainees: Pilot evaluation of a task-based course. \textit{Frontiers in Psychology}, \textit{13}, Article 939689.~\href{https://doi.org/10.3389/fpsyg.2022.939689}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SSCI二区}
 
-\item[2012] \tab{}杨明星，\textbf{闫达.} \enquote{政治等效”理论框架下外交语言的翻译策略——以“不折腾”的译法为例} \textit{解放军外国语学院学报}, 2012(3), 73-77. \textbf{[CSSCI]}
+\item[2022] \textbf{Yan, D.} Review of the book \textit{Cognitive bases of second language fluency}, Norman Segalowitz (Ed.). \textit{Porta Linguarum}, \textit{38}.~\href{https://doi.org/10.30827/portalin.vi38.23934}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SSCI二区、书评}
 
+\item[2018] 杨明星，吴丽华，牛桂玲，\textbf{闫达}。“互联网+”背景下多模态、多语种外交话语平行语料库设计与创建探析。《外语教学》，\textit{39}(6)，13--19。 \pubtag{CSSCI}
+
+\item[2016] Yang, M., \& \textbf{Yan, D.} The translation strategies for Chinese diplomatic neologisms from the perspective of ``Political Equivalence''. \textit{Babel}, \textit{62}(4), 661--675.~\href{https://doi.org/10.1075/babel.62.4.07yan}{\aiDoi} \pubtag{SSCI三区、A\&HCI}
+
+\item[2013] 杨明星，\textbf{闫达}。现代信息技术条件下外交机辅翻译模型研究初探。《外语电化教学》，\textit{2013}(3)，33--41。 \pubtag{CSSCI}
+
+\item[2012] 杨明星，\textbf{闫达}。“政治等效”理论框架下外交语言的翻译策略——以“不折腾”的译法为例。《解放军外国语学院学报》，\textit{35}(3)，73--77。 \pubtag{CSSCI}
 \end{tablist}
 
-
-\subsection*{已发表书评}
+\cvsection{学术会议}
 
 \begin{tablist}
+\item[2026] \textbf{闫达}。“Towards Hybrid Intelligent Feedback in EFL Writing: A Qualitative Inquiry into GenAI-Augmented Peer Dialogue and Co-Regulated Learning”。第十五届外语写作教学与研究国际研讨会，中国人民大学，北京。
 
-\item[2022] \tab{}\textbf{Yan, D.} \enquote{Cognitive bases of second language fluency. Norman Segalowitz (Ed.), Routledge (2010), 258 pages, ISBN:978-0-8058-5662-0.} \textit{Porta Linguarum Revista Interuniversitaria de Didáctica de Las Lenguas Extranjeras}, 38. \href{https://doi.org/10.30827/portalin.vi38.23934}{doi:10.30827/portalin.vi38.23934} \textbf{[A\&HCI；SSCI二区]}
+\item[2025] \textbf{闫达}。“当中医药翻译遇上生成式人工智能：《黄帝内经》英译人机交互中的‘分歧-趋同-惊喜’”。第五届中医药文化翻译与国际传播学术研讨会，温州医科大学，12月05--07日。
 
+\item[2025] \textbf{闫达}。“打破边界与重塑范式：新时代背景下的翻译研究新图景”。温州医科大学外国语学院学者学术沙龙，12月24日。
+
+\item[2025] \textbf{闫达}。“从‘能动性之舞’到共生：生成式AI下的译者主动性”。温州市翻译协会学术年会，11月21日。
+
+\item[2025] \textbf{闫达}。“生成式人工智能视野下跨文化及语言传播译介的机遇与挑战”。高校国别和区域研究人才培养与学科建设联盟第七届年会，浙江工业大学，10月31日--11月02日。
+
+\item[2023] \textbf{Yan, D.} \enquote{L2 Writers' Feedback-Seeking from ChatGPT for Automated Written Corrective Feedback: Insights from a Multiple Case Study}. 第六届国际研究生学术研讨会（InPaC 2023），马来西亚理科大学语言、文学与翻译学院，12月12--13日。
+
+\item[2023] \textbf{Yan, D.} \enquote{Unpacking L2 Writer's Feedback Processing in an Innovative Learning Environment Empowered by ChatGPT}. 研究生学术研讨会（PGRC 2023），马来西亚泰莱大学，11月03--04日。
+
+\item[2022] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. \enquote{Gender Difference in Digital Literacy Among Translation Trainees}. 亚太语言与性别学术研讨会，08月11--12日。
 \end{tablist}
 
-\subsection*{学位论文}
-\begin{tablist}
-\item[2024] \tab{}\textbf{Yan, D.} \enquote{Development of a formative assessment regime for Chinese-English interpreter training and its effects on academic achievement, motivation, and collaboration} \textit{School of Languages, Literacies \& Translation, University of Science Malaysia (马来西亚理科大学)} [博士论文]
+\cvsection{主持科研项目}
 
-\item[2013] \tab{}\textbf{闫达} \enquote{解构主义视角下自译中的译者主动性研究——林语堂作品个案分析} \textit{温州大学外国语学院} [硕士论文]
+\begin{tablist}[itemsep=0.08em, parsep=0.08em]
+\item[2026] 浙江高校外语专业人机协同教学阻滞与优化路径研究，\textbf{浙江省哲学社会科学规划课题}
+
+\item[2026] 生成式人工智能赋能课堂形成性评估中的认知外包风险及防范策略研究，\textbf{温州市科技项目}
+
+\item[2026] 第二语言课堂中同伴与人工智能协同反馈下的人际与人机交互模式及影响机制研究，\textbf{浙江省教育科学规划课题}
+
+\item[2024] 利用人工智能技术促进语言教学课堂形成性反馈，\textbf{河南省社会科学界联合会调研课题}
+
+\item[2024] 利用机器学习及文本挖掘技术促进课堂形成性反馈，\textbf{信阳市社科联调研课题}
+
+\item[2022] 利用机器学习及文本挖掘技术促进语言教学课堂形成性反馈，\textbf{信阳农林学院青年基金项目}
+
+\item[2021] 基于现代信息技术的英汉双语课程思政语料库构建与应用研究分析，\textbf{信阳市社科联调研课题}
+
+\item[2021] 新时代背景下河南特色文化对外宣传英汉双语平行语料库建设研究，\textbf{河南省社会科学界联合会调研课题}
+
+\item[2019] 新时代河南出彩故事外宣中英双语对照读本，\textbf{河南省社会科学界联合会调研课题}
+
+\item[2019] 解构主义视域下的《论语》英译本文化翻译研究，\textbf{河南省社会科学界联合会、河南省经济学团体联合会调研课题}
+
+\item[2018] 自然语言处理科普读本，\textbf{河南省社会科学界联合会调研课题}
+
+\item[2017] 解构主义视角下网络热词中译英研究，\textbf{信阳市社科联调研课题}
+
+\item[2017] 通俗翻译史入门读本，\textbf{河南省社会科学界联合会调研课题}
+
+\item[2015] 生成语法视阈下跨语言语法比较研究的价值及其在教学中的应用，\textbf{河南省教育厅人文社会科学研究项目}
+
+\item[2014] 构建基于语料库的英汉互译自动评分系统辅助高校翻译教学，\textbf{信阳市社科联调研课题}
 \end{tablist}
 
-%  \subsection*{待发表及工作论文}
-%  \begin{tablist}
-%
-%    \item[2025] \tab{}\textbf{Yan, D.}, Kasuma, S.A.A., Amini, M., \& Khan, A. \enquote{Revisiting dialogic feedback in the age of generative artificial intelligence: an investigation into feedback seeking interactions}. In G. Durak, S. Çankaya, \& M. Sharples (Eds.) \textit{Generative AI in Education: Innovations, Challenges, and Future Prospects} 已获批、撰写中 \textbf{[Springer出版社]}
-%
-%    \item[2025] \tab{}\textbf{Yan, D.}, Amini, M.*, \& Wu, S. \enquote{Classroom assessment in translation and interpreter training: a systematic review}. In M. Amini (Eds.) \textit{Cutting-Edge Approaches in Translator Education and Pedagogy} 已获批、撰写中 \textbf{[IGI出版社]}
-%
-%    \item[2025] \tab{}\textbf{Yan, D.*}, Gao, Y., Gao, T., \& He, H. \enquote{Shall and how can we teach translators more advanced technologies? a collective ethnography of curriculum developers}. In M. Amini (Eds.) \textit{Cutting-Edge Approaches in Translator Education and Pedagogy} 已获批、撰写中 \textbf{[IGI出版社]}
-%
-%    \item[2025] \tab{}\textbf{Yan, D.*} \& Tian, F. \enquote{Changing landscape of pedagogy and assessment in the age of generative artificial intelligence: practice, opportunities, and challenges}. In J. Zhang, W.A.J.W. Yahaya, M.S.Sanmugam, \& D.L.Yie (Eds.) \textit{Integrating Technology in Problem-Solving Educational Practices}已获批、撰写中 \textbf{[IGI出版社]}
-%
-%    \item[2025] \tab{}Tian, F., Irfan, N.B.U., \& \textbf{Yan, D.} \enquote{Mobile assisted academic vocabulary acquisition: a systematic literature review}. In J. Zhang, W.A.J.W. Yahaya, M.S.Sanmugam, \& D.L.Yie (Eds.) \textit{Integrating Technology in Problem-Solving Educational Practices}已获批、撰写中 \textbf{[IGI出版社]}
-%
-%    \item[2024] \tab{}\textbf{Yan, D.} \enquote{Co-creating rubric to affect focus and trust of L2 peer feedback} \textit{Relc Journal} 审稿中 \textbf{[SSCI一区\textcolor{red}{顶刊}]}
-%
-%    \item[2024] \tab{}\textbf{Yan, D.} \enquote{Metacognitive scaffolding for feedback seeking of undergraduate L2 writers using ChatGPT as automated written corrective feedback provider} \textit{Instructional Science} 审稿中 \textbf{[SSCI二区]}
-%
-%    \item[2024] \tab{}\textbf{Yan, D.} \enquote{Towards sustainable peer feedback through GenAI-enhanced feedback-on-feedback} \textit{Higher Education Research \& Development} 审稿中 \textbf{[SSCI一区\textcolor{red}{顶刊}]}
-%
-%    \item[2024] \tab{}\textbf{Yan, D.*}, \& Tian, F. \enquote{Two is better than one? Evaluating the interactive effects of co-creating rubric and online dialogic feedback on peer feedback
-%    } \textit{Studies in Educational Evaluation} 审稿中 \textbf{[SSCI一区]}
-%
-%    \item[2023] \tab{}\textbf{Yan, D.}, Kasuma, S.A.A*.,\& Amini. M. \enquote{The roles of self-efficacy and academic resilience in mediating the relationship between peer feedback perceptions and engagement among L2 writers} \textit{Asia Pacific Education Review}, 考虑中 \textbf{[SSCI一区]}
-%
-%  \end{tablist}
+\cvsection{讲授课程}
 
+\noindent
+{\normalsize\renewcommand{\arraystretch}{1.08}%
+\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}ccc@{}}
+  \textbf{课程名称} & \textbf{开课学校} & \textbf{课程代码} & \textbf{开课年份} \\
+  \hline
+  \addlinespace[0.25em]
+  通用医学英语 II & 温州医科大学 & NN220320 & 2026 \\
+  通用医学英语 I & 温州医科大学 & NN220318 & 2025 \\
+  英语写作 I & 温州医科大学 & NN220168 & 2025 \\
+  大学英语 1 & 温州医科大学 & NN220315 & 2025 \\
+  国际商务函电 & 温州医科大学 & NN220367 & 2025 \\
+  基础口译 & 信阳农林学院 & B0632007 & 2017--2024 \\
+  高级口译 & 信阳农林学院 & 06063017 & 2020--2024 \\
+  计算机辅助翻译 & 信阳农林学院 & 06062036 & 2020--2024 \\
+  翻译概论 & 信阳农林学院 & 07008 & 2013--2023 \\
+  专业英语选读 & 信阳农林学院 & 06063097 & 2018--2020 \\
+  英语写作 & 信阳农林学院 & 16032 & 2016--2019 \\
+  英语阅读 & 信阳农林学院 & 06062016 & 2016--2019 \\
+  商务谈判 & 信阳农林学院 & 07030 & 2014 \\
+  大学英语 & 信阳农林学院 & 07004 & 2013 \\
+  英语语法 & 信阳农林学院 & 07049 & 2013 \\
+\end{tabular*}}
 
-\section*{参加学术会议}
-\subsection*{与会宣读论文}
-\begin{tablist}
+\cvsection{荣誉奖励}
 
-\item[2026] \tab{}\textbf{Yan, D.}\enquote{Towards Hybrid Intelligent Feedback in EFL Writing: A Qualitative Inquiry into GenAI-Augmented Peer Dialogue and Co-Regulated Learning} \textit{The 15th International Symposium on Teaching and Research of Foreign Language Writing}, Renmin University of China (RUC), Beijing.
-
-\item[2025] \tab{}\textbf{Yan, D.}\enquote{When Traditional Chinese Medicine Translation Meets Generative AI: \enquote{Divergence, Convergence, and Surprise} in Human-AI Interaction for the English Translation of \textit{Huangdi Neijing}} \textit{The 5th Academic Symposium on Traditional Chinese Culture Translation and International Communication}, Wenzhou Medical University (WMU), Dec 05--07.
-
-\item[2025] \tab{}\textbf{Yan, D.}\enquote{Breaking Boundaries and Reshaping Paradigms: New Landscapes of Translation Studies in the New Era} \textit{Scholar's Tea Talk}, School of Foreign Language Studies, Wenzhou Medical University (WMU).
-
-\item[2025] \tab{}\textbf{Yan, D.}\enquote{From \enquote{Dance of Agency} to Symbiosis: Translator Agency in the Age of GenAI} \textit{Annual Meeting of Wenzhou Translators Association}, Nov 29.
-
-\item[2025] \tab{}\textbf{Yan, D.}\enquote{Opportunities and Challenges of Cross-Cultural and Linguistic Communication and Translation in the Vision of Generative AI} \textit{The 7th Annual Conference of the Alliance for Regional and Country Studies Talent Cultivation and Discipline Construction}, Zhejiang University of Technology (ZJUT), Oct 31--Nov 02.
-
-\item[2023] \tab{}\textbf{Yan, D.}\enquote{L2 Writers' Feedback-Seeking from ChatGPT for Automated Written Corrective Feedback: Insights  from a Multiple Case Study} \textit{6th International Postgraduate Colloquium (InPaC) 2023}, Dec 12--13.
-
-\item[2023] \tab{}\textbf{Yan, D.}\enquote{L2 writer's feedback processing in the context of computer-mediated language learning} \textit{Post-Graduate Research
-  Colloquium(PGRC 2023)}, Nov 03--04.
-
-\item[2022] \tab{}\textbf{Yan, D.}, Kasuma, S.A.A., \& Amini. M.\enquote{Gender Difference in Digital Literacy Among Translation Trainees} \textit{Asia Pacific Conference on Language and Gender 2022}, Aug 11--12.
-
+\begin{tablist}[itemsep=0.06em, parsep=0.06em]
+\item[2026] 全球前 2\% 顶尖科学家榜单 \pubtag{斯坦福大学 / 爱思唯尔}
+\item[2026] 2025年度外国语学院科研业绩奖 \pubtag{温州医科大学外国语学院}
+\item[2026] 青年教师助讲培养考核优秀（2025--26学年） \pubtag{温州医科大学}
+\item[2020] 全国翻译技术教学大赛华中大区赛二等奖 \pubtag{世界翻译教育联盟 / 广外高翻学院}
+\item[2020] 优秀教师 \pubtag{信阳农林学院}
+\item[2020] 教师教学技能竞赛三等奖 \pubtag{信阳农林学院}
+\item[2019] 优秀教师 \pubtag{信阳农林学院}
+\item[2019] 青年教师教学技能竞赛优秀奖 \pubtag{信阳农林学院}
+\item[2016] 河南省教学技能竞赛三等奖 \pubtag{河南省教育厅}
+\item[2016] 青年教师教学技能竞赛三等奖 \pubtag{信阳农林学院}
+\item[2016] 青年教师教学技能竞赛一等奖 \pubtag{信阳农林学院外国语学院}
+\item[2014] 优秀班主任 \pubtag{信阳农林学院}
 \end{tablist}
 
-\subsection*{会议论文集发表}
-\begin{tablist}
-  %    \item[2023] \tab{}\textbf{Yan, D.}\enquote{L2 Writers’ Feedback-Seeking from ChatGPT for Automated Written Corrective Feedback: Insights  from a Multiple Case Study} in \textit{ Proceedings of the 6th International Postgraduate Colloquium (INPAC 2023)}. School of Languages, Literacies \& Translation, University of Science, Malaysia.
+\cvsection{社会服务}
 
-\item[2023] \tab{}\textbf{Yan, D.}\enquote{Unpacking L2 writer's feedback processing in an innovative learning environment empowered by ChatGPT} in R. Konar, J. Jain, \& S.M. Rasoolimanesh (Eds.)\textit{ Proceeding of Postgraduate Research Colloquium (PGRC) 2023} (pp.154-157). Taylor's University, Malaysia.
-
-\end{tablist}
-
-\section*{主持科研项目}
-\begin{tablist}
-\item[2026] \tab{}浙江高校外语专业人机协同教学阻滞与优化路径研究 \textbf{[2027年度浙江省哲学社会科学规划课题]}
-\item[2026] \tab{}生成式人工智能赋能课堂形成性评估中的认知外包风险及防范策略研究 \textbf{[2026年度温州市科技项目]}
-\item[2026] \tab{}第二语言课堂中同伴与AI协同反馈下的人际与人机交互模式及影响机制研究\textbf{[浙江省教育科学规划课题]}
-\item[2024] \tab{}利用人工智能技术促进语言教学课堂形成性反馈\textbf{[河南省社会科学界联合会]}
-\item[2024] \tab{}利用机器学习及文本挖掘技术促进课堂形成性反馈
-  \textbf{[信阳市社科联]}
-\item[2022] \tab{}利用机器学习及文本挖掘技术促进语言教学课堂形成性反馈\textbf{[信阳农林学院]}
-
-\item[2021] \tab{}基于现代信息技术的英汉双语课程思政语料库构建与应用研究分析\textbf{[信阳市社科联]}
-\item[2021] \tab{}新时代背景下河南特色文化对外宣传英汉双语平行语料库建设研究
-  \textbf{[河南省社会科学界联合会]}
-\item[2019] \tab{}新时代河南出彩故事外宣中英双语对照读本
-  \textbf{[河南省社会科学界联合会]}
-\item[2019] \tab{}解构主义视域下的《论语》英译本文化翻译研究 \textbf{[河南省社会科学界联合会；河南省经济学团体联合会]}
-\item[2018] \tab{}自然语言处理科普读本 \textbf{[河南省社会科学界联合会]}
-\item[2017] \tab{}解构主义视角下网络热词中译英研究\textbf{[信阳市社科联]}
-\item[2017] \tab{}通俗翻译史入门读本 \textbf{[河南省社科联]}
-\item[2015] \tab{}生成语法视阈下跨语言语法比较研究的价值及其在教学中的应用 \textbf{[河南省教育厅]}
-\item[2014] \tab{}构建基于语料库的英汉互译自动评分系统辅助高校翻译教学 \textbf{[信阳市社科联]}
-\end{tablist}
-
-\section*{奖项荣誉}
-\begin{tablist}
-\item[2026] \tab{}全球前 2\% 顶尖科学家榜单 (World's Top 2\% Scientists) \textbf{[Stanford / Elsevier]}
-\item[2020] \tab{}全国翻译技术教学大赛华中大区赛二等奖 \textbf{[世界翻译教育联盟；广外高翻学院]}
-\item[2020] \tab{}优秀教师 \textbf{[信阳农林学院]}
-\item[2019] \tab{}优秀教师 \textbf{[信阳农林学院]}
-\item[2019] \tab{}青年教师教学技能竞赛优秀奖 \textbf{[信阳农林学院]}
-\item[2016] \tab{}全省教学技能竞赛三等奖 \textbf{[河南省教育厅]}
-\end{tablist}
-
-\section*{教学经验}
-
-\subsection*{于\space\space 信阳农林学院\space\space 所授课程}
-
-\begin{tablist}
-\item[\textbf{翻译概论}] 翻译本科专业 (BTI) 核心课程，在整个翻译专业人才培养中该课程起到提纲挈领的作用。该课程旨在引导学习者全面认识翻译、理解翻译,对翻译基本理论问题有所了解,加深对翻译职业性质的认识,从而树立正确的翻译观,提高翻译技能。自信阳农林学院外国语学院筹办翻译专业始，一直担任该课程的教学工作。通过该课堂的教学，为该校翻译专业学生的专业技能提升打下了扎实的基础。
-\item[\textbf{基础口译}] BTI 核心课程，与《高级口译》等系列系列口译课程打造了BTI人才培养中口译训练与技能的核心发展路线。本人在口译训练及配套课堂评估方面有一定建树，善于将科研成果转化为课堂训练效果提升。在信阳农林学院外国语学院翻译本科专业的筹建和发展过程中，本人一直深度参与口译系列课程的设计、开发、维护及管理。
-\item[\textbf{高级口译}] 参见上条。
-\item[\textbf{计算机辅助翻译}] BTI 主要实操课程之一，为学生提供一个将理论知识付诸实践的平台。自信阳农林学院外国语学院筹建翻译本科专业始，本人一直负责本课程的开发设计与教学工作。在相对有限的教学条件下，利用低成本、免费、及开放源代码软件搭建了一套行之有效、部署成本低廉、运行维护简易的学习平台和训练实操体系，并沿用至今。本人对于教育技术及翻译口译训练中的技术运用有较深研究，同时善于将最新研究所得及前沿学术成功转换为教学中的改革与创新。
-\item[\textbf{诸多其他翻译专业及商务英语专业非核心课程}] 不再赘述。
-\end{tablist}
-
-\section*{专业及社会服务}
-\subsection*{社会服务}
-\begin{enumerate}
-  \item 协助温州市贸促会，担任涉外活动现场同传
-  \item 协助信阳市外事办，担任多届“信阳市国际茶文化节” 主会场同声传译
-  \item 协助信阳市人民政府，担任多次涉外国际活动现场同声传译及翻译
-  \item 协助信阳农林学院国际合作交流中心对接德国复兴信贷银行，担任会场同声/交替传译
+\begin{enumerate}[itemsep=0.10em, parsep=0.08em, topsep=0.08em]
+  \item 协助中国国际贸易促进委员会温州市委员会，担任涉外经贸活动同声传译；
+  \item 协助信阳市人民政府外事办公室，担任多届“信阳国际茶文化节”主会场同声传译；
+  \item 协助信阳市人民政府，担任涉外事务及国际交流活动现场同声传译及交替传译；
+  \item 协助信阳农林学院国际合作交流中心对接德国复兴信贷银行，担任国际金融合作项目会场同声传译及交替传译。
 \end{enumerate}
 
+\cvsection{学术服务}
 
-\subsection*{担任期刊编辑}
-\begin{enumerate}
-  \item Scientific Reports \textit{编委} \textbf{[SCI：综合]}
-  \item Humanities and Social Sciences Communications \textit{编委} \textbf{[SSCI：社会科学]}
-  \item PLoS One \textit{学术编辑} \textbf{[SCI：综合]}
+\vspace{0.2em}
+\noindent\textbf{期刊编委与学术编辑：}
+\begin{enumerate}[itemsep=0.05em, parsep=0.05em, topsep=0.08em]
+  \item \textit{Scientific Reports} 编委 \pubtag{SCI：综合}
+  \item \textit{Humanities \& Social Sciences Communications} 编委 \pubtag{SSCI：社科综合}
+  \item \textit{PLoS One} 学术编辑 \pubtag{SCI：综合}
 \end{enumerate}
 
-\subsection*{担任期刊特邀评审专家}
-
-\begin{enumerate}
-  \item Computer Assisted Language Learning \textbf{[SSCI: 语言学]}
-  \item Journal of Second Language Writing \textbf{[SSCI: 语言学]}
-  \item TESOL Quarterly \textbf{[SSCI: 语言学]}
-  \item ELT Journal \textbf{[SSCI: 语言学]}
-  \item System \textbf{[SSCI: 语言学]}
-  \item ReCALL \textbf{[SSCI: 语言学]}
-  \item Journal of Computer-assisted Learning \textbf{[SSCI: 教育学]}
-  \item Assessing Writing \textbf{[SSCI: 语言学]}
-  \item International Journal of Computer-Supported Collaborative Learning \textbf{[SSCI: 教育学]}
-  \item International Journal of STEM Education \textbf{[SSCI: 教育学]}
-  \item Studies in Higher Education \textbf{[SSCI: 教育学]}
-  \item Language Teaching Research \textbf{[SSCI: 语言学]}
-  \item International Journal of Applied Linguistics \textbf{[SSCI: 语言学]}
-  \item International Review of Applied Linguistics in Language Teaching \textbf{[SSCI: 语言学]}
-  \item RELC Journal\textbf{[SSCI: 语言学]}
-  \item Studies in Educational Evaluation\textbf{[SSCI: 教育学]}
-  \item Innovation in Language Learning and Teaching \textbf{[SSCI: 语言学]}
-  \item International Journal of Sustainability in Higher Education \textbf{[SSCI: 教育学]}
-  \item Research Methods in Applied Linguistics \textbf{[Scopus: 语言学]}
-  \item Kybernetes \textbf{[SCI: 人机互动、控制论]}
-  \item npj Science of Learning \textbf{[SSCI: 教育学]}
-  \item Instructional Science \textbf{[SSCI: 教育学]}
-  \item Humanities and Social Sciences Communications \textbf{[SSCI: 社科综合]}
-  \item Scientific Reports \textbf{[SCI: 综合]}
-  \item Frontiers in Psychology \textbf{[SSCI: 心理学；社科综合]}
-  \item PLoS One \textbf{[SCI: 综合]}
-  \item Sage Open \textbf{[SSCI: 社科综合]}
-  \item Cogent Education \textbf{[Scopus: 教育学]}
-  \item Forum for Linguistic Studies \textbf{[Scopus: 语言学]}
-  \item Information and Learning Science \textbf{[ESCI: 教育技术学]}
-  \item Information, Communication and Society \textbf{[ESCI: 传播学]}
-  \item Journal of Infrastructure, Policy and Development\textbf{[ESCI: 社科综合]}
-  \item Review of Education \textbf{[ESCI: 教育学]}
-  \item Discover Education \textbf{[ProQuest: 教育学]}
-  \item International Journal of Changes in Education \textbf{[Scilit: 教育学]}
-  \item Frontiers of Digital Education \textbf{[教育学]}
-  \item New Voices in Translation Studies \textbf{[Scopus: 翻译学]}
+\vspace{0.25em}
+\noindent\textbf{特邀同行评审专家：}
+\begin{enumerate}[itemsep=0.05em, parsep=0.05em, topsep=0.08em]
+  \item Computer Assisted Language Learning \pubtag{SSCI：语言学}
+  \item Journal of Second Language Writing \pubtag{SSCI：语言学}
+  \item TESOL Quarterly \pubtag{SSCI：语言学}
+  \item ELT Journal \pubtag{SSCI：语言学}
+  \item SYSTEM \pubtag{SSCI：语言学}
+  \item Assessing Writing \pubtag{SSCI：语言学}
+  \item International Journal of Computer-Supported Collaborative Learning \pubtag{SSCI：教育学}
+  \item International Journal of STEM Education \pubtag{SSCI：教育学}
+  \item ReCALL \pubtag{SSCI：语言学}
+  \item Language Learning \& Technology \pubtag{SSCI：语言学}
+  \item Journal of Computer-assisted Learning \pubtag{SSCI：教育学}
+  \item Studies in Higher Education \pubtag{SSCI：教育学}
+  \item Language Teaching Research \pubtag{SSCI：语言学}
+  \item International Journal of Applied Linguistics \pubtag{SSCI：语言学}
+  \item International Review of Applied Linguistics in Language Teaching \pubtag{SSCI：语言学}
+  \item RELC Journal \pubtag{SSCI：语言学}
+  \item Studies in Educational Evaluation \pubtag{SSCI：教育学}
+  \item Innovation in Language Learning and Teaching \pubtag{SSCI：语言学}
+  \item International Journal of Sustainability in Higher Education \pubtag{SSCI：教育学}
+  \item Research Methods in Applied Linguistics \pubtag{Scopus：语言学}
+  \item Kybernetes \pubtag{SCI：控制论、人机交互}
+  \item npj Science of Learning \pubtag{SSCI：教育学}
+  \item Instructional Science \pubtag{SSCI：教育学}
+  \item Humanities \& Social Sciences Communications \pubtag{SSCI：社科综合}
+  \item Scientific Reports \pubtag{SCI：综合}
+  \item Frontiers in Psychology \pubtag{SSCI：心理学、社科综合}
+  \item PLoS One \pubtag{SCI：综合}
+  \item SAGE Open \pubtag{SSCI：社科综合}
+  \item Cogent Education \pubtag{Scopus：教育学}
+  \item Forum for Linguistic Studies \pubtag{Scopus：语言学}
+  \item Information and Learning Science \pubtag{ESCI：教育技术}
+  \item Information, Communication and Society \pubtag{ESCI：传播学}
+  \item Journal of Infrastructure, Policy and Development \pubtag{ESCI：社科综合}
+  \item Review of Education \pubtag{ESCI：教育学}
+  \item New Voices in Translation Studies \pubtag{Scopus：翻译学}
 \end{enumerate}
-
-% display today's date as Month Year after a vertical space below the end of the text
-\begin{center}
-  更新于：\textbf{\edittoday}
-\end{center}
 
 \end{document}
