@@ -26,7 +26,35 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .fonts
-          key: cv-external-fonts-v3
+          key: cv-external-fonts-v4
+
+      - name: Install 汇文正楷 (Huiwen ZhengKai) heading font
+        env:
+          HUIWEN_FONT_B64: ${{ secrets.HUIWEN_FONT_B64 }}
+        run: |
+          # CV-cn.tex uses 汇文正楷 as its ONLY CJK heading face and has no fallback,
+          # so the build cannot succeed without it. The TTF is personal-use licensed
+          # and therefore NOT in the repository; it is stored base64-encoded in the
+          # HUIWEN_FONT_B64 repository secret.
+          if [ -z "$HUIWEN_FONT_B64" ]; then
+            echo "::error::Secret HUIWEN_FONT_B64 is not set. Create it from the local font:"
+            echo "::error::  base64 -i fonts/HuiwenZhengKai.ttf | pbcopy  (then paste into the repo secret)"
+            exit 1
+          fi
+          mkdir -p fonts
+          printf '%s' "$HUIWEN_FONT_B64" | base64 --decode > fonts/HuiwenZhengKai.ttf
+
+          # Fail fast on a truncated / corrupted / text-wrapped secret.
+          if [ ! -s fonts/HuiwenZhengKai.ttf ]; then
+            echo "::error::Decoded fonts/HuiwenZhengKai.ttf is empty -- the secret is not valid base64."
+            exit 1
+          fi
+          sig=$(head -c 4 fonts/HuiwenZhengKai.ttf | od -An -tx1 | tr -d ' \n')
+          case "$sig" in
+            00010000|74727565|4f54544f) ;;   # TrueType, 'true', 'OTTO'
+            *) echo "::error::fonts/HuiwenZhengKai.ttf is not a TrueType/OpenType font (signature: $sig)."; exit 1 ;;
+          esac
+          ls -l fonts/HuiwenZhengKai.ttf
 
       - name: Download Noto Serif CJK SC (static faces)
         if: steps.font-cache.outputs.cache-hit != 'true'
@@ -51,6 +79,21 @@ jobs:
             fonts/*.ttf
             .fonts/*.ttf
             .fonts/*.otf
+
+      - name: Verify Chinese CV uses Huiwen ZhengKai
+        run: |
+          # A missing or mis-named CJK heading face would otherwise only show up as
+          # a wrong-looking PDF, so assert on the fonts actually embedded in it.
+          command -v pdffonts >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils; }
+          pdffonts CV-cn.pdf
+          pdffonts CV-cn.pdf | grep -qi 'HuiwenZhengkai' \
+            || { echo "::error::CV-cn.pdf does not embed Huiwen ZhengKai -- CJK headings are wrong."; exit 1; }
+          pdffonts CV-cn.pdf | grep -qi 'NotoSerifCJKsc' \
+            || { echo "::error::CV-cn.pdf does not embed Noto Serif CJK SC -- CJK body text is wrong."; exit 1; }
+          # No trace of the removed fallback face.
+          if pdffonts CV-cn.pdf | grep -qi 'FZYTK'; then
+            echo "::error::CV-cn.pdf still embeds the retired FZYTK fallback face."; exit 1
+          fi
 
       - name: Upload PDF artifacts
         uses: actions/upload-artifact@v4
