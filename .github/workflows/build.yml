@@ -30,31 +30,37 @@ jobs:
 
       - name: Install 汇文正楷 (Huiwen ZhengKai) heading font
         env:
-          HUIWEN_FONT_B64: ${{ secrets.HUIWEN_FONT_B64 }}
+          HUIWEN_FONT_KEY: ${{ secrets.HUIWEN_FONT_KEY }}
         run: |
+          set -euo pipefail
           # CV-cn.tex uses 汇文正楷 as its ONLY CJK heading face and has no fallback,
           # so the build cannot succeed without it. The TTF is personal-use licensed
-          # and therefore NOT in the repository; it is stored base64-encoded in the
-          # HUIWEN_FONT_B64 repository secret.
-          if [ -z "$HUIWEN_FONT_B64" ]; then
-            echo "::error::Secret HUIWEN_FONT_B64 is not set. Create it from the local font:"
-            echo "::error::  base64 -i fonts/HuiwenZhengKai.ttf | pbcopy  (then paste into the repo secret)"
+          # and therefore not committed in the clear: assets/HuiwenZhengKai.ttf.gz.enc
+          # is the gzip'd font encrypted with AES-256-CBC (PBKDF2-HMAC-SHA256), and the
+          # passphrase lives in the HUIWEN_FONT_KEY repository secret.
+          # A 48 KB secret limit rules out storing the font itself as base64.
+          if [ -z "${HUIWEN_FONT_KEY:-}" ]; then
+            echo "::error::Secret HUIWEN_FONT_KEY is not set; cannot decrypt the CJK heading font."
             exit 1
           fi
-          mkdir -p fonts
-          printf '%s' "$HUIWEN_FONT_B64" | base64 --decode > fonts/HuiwenZhengKai.ttf
 
-          # Fail fast on a truncated / corrupted / text-wrapped secret.
-          if [ ! -s fonts/HuiwenZhengKai.ttf ]; then
-            echo "::error::Decoded fonts/HuiwenZhengKai.ttf is empty -- the secret is not valid base64."
+          mkdir -p fonts
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -md sha256 \
+            -pass env:HUIWEN_FONT_KEY \
+            -in assets/HuiwenZhengKai.ttf.gz.enc -out "$RUNNER_TEMP/huiwen.ttf.gz"
+          gunzip -c "$RUNNER_TEMP/huiwen.ttf.gz" > fonts/HuiwenZhengKai.ttf
+
+          # Verify the decrypted bytes against the committed checksum, so a wrong
+          # passphrase or a corrupted blob fails here with a clear message.
+          expected=$(cat assets/HuiwenZhengKai.ttf.sha256)
+          actual=$(sha256sum fonts/HuiwenZhengKai.ttf | awk '{print $1}')
+          if [ "$expected" != "$actual" ]; then
+            echo "::error::Decrypted HuiwenZhengKai.ttf checksum mismatch (wrong HUIWEN_FONT_KEY or corrupt blob)."
             exit 1
           fi
-          sig=$(head -c 4 fonts/HuiwenZhengKai.ttf | od -An -tx1 | tr -d ' \n')
-          case "$sig" in
-            00010000|74727565|4f54544f) ;;   # TrueType, 'true', 'OTTO'
-            *) echo "::error::fonts/HuiwenZhengKai.ttf is not a TrueType/OpenType font (signature: $sig)."; exit 1 ;;
-          esac
           ls -l fonts/HuiwenZhengKai.ttf
+
+      - name: Download Noto Serif CJK SC (static faces)
 
       - name: Download Noto Serif CJK SC (static faces)
         if: steps.font-cache.outputs.cache-hit != 'true'

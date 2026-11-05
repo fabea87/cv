@@ -29,13 +29,23 @@ PDF outputs are automatically compiled via GitHub Actions with XeLaTeX, deployed
   - **Noto Serif CJK SC**: Simplified Chinese body serif in `CV-cn.tex`. Install with
     `brew install font-noto-serif-cjk-sc`; CI fetches the static Regular + Bold OTFs.
   - **汇文正楷 (Huiwen ZhengKai)**: the **only** CJK heading face in `CV-cn.tex`.
-    **Not committed** (personal-use licence, no redistribution) and **no fallback font** —
-    the build fails hard if `fonts/HuiwenZhengKai.ttf` is missing.
-    - Local: drop `HuiwenZhengKai.ttf` into `fonts/`.
-    - CI: store it base64-encoded in the `HUIWEN_FONT_B64` repository secret
-      (`base64 -i fonts/HuiwenZhengKai.ttf | pbcopy`); the workflow decodes it, validates the
-      TrueType signature, and afterwards asserts via `pdffonts` that the PDF really embeds
-      `HuiwenZhengkai` (and still no `FZYTK`).
+    **No fallback font** — the build fails hard if `fonts/HuiwenZhengKai.ttf` is missing.
+    - Local: drop `HuiwenZhengKai.ttf` into `fonts/` (gitignored).
+    - CI: the font is committed **encrypted** as `assets/HuiwenZhengKai.ttf.gz.enc`
+      (gzip + AES-256-CBC, PBKDF2-HMAC-SHA256) because the personal-use licence forbids
+      redistribution and GitHub's 48 KB secret limit rules out storing it as base64.
+      The workflow decrypts it with the `HUIWEN_FONT_KEY` secret, checks the result
+      against `assets/HuiwenZhengKai.ttf.sha256`, and finally asserts via `pdffonts`
+      that the PDF really embeds `HuiwenZhengkai` (and no `FZYTK`).
+
+    To re-seal after replacing the font locally:
+
+    ```bash
+    gzip -9 -c fonts/HuiwenZhengKai.ttf > /tmp/hw.gz
+    openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -md sha256 -salt \
+      -pass env:HUIWEN_FONT_KEY -in /tmp/hw.gz -out assets/HuiwenZhengKai.ttf.gz.enc
+    shasum -a 256 fonts/HuiwenZhengKai.ttf | awk '{print $1}' > assets/HuiwenZhengKai.ttf.sha256
+    ```
 
 > `CV-cn.tex` deliberately uses the **static** Noto Serif CJK SC family. The variable
 > `Noto Serif SC` (`NotoSerifSC[wght].ttf`) has no separate bold face, and XeTeX ignores

@@ -6,8 +6,11 @@ sync.ffs_db
 # CI and local font cache
 .fonts/
 
-# Personal-use licensed font (汇文正楷): no redistribution, not committed
+# Personal-use licensed font (汇文正楷): no redistribution, not committed in the clear.
+# Only the encrypted asset in assets/ is tracked; never commit the plaintext or
+# the intermediate gzip.
 fonts/HuiwenZhengKai.ttf
+*.ttf.gz
 
 # Compiled output documents
 *.pdf
@@ -38,3 +41,6 @@ fonts/HuiwenZhengKai.ttf
 *.toc
 *.vrb
 *.xdv
+
+# Local copy of the HUIWEN_FONT_KEY passphrase
+.huiwen-key.txt
