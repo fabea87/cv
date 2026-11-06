@@ -55,7 +55,7 @@ PDF outputs are automatically compiled via GitHub Actions with XeLaTeX, deployed
 
 Punctuation is scoped by section:
 
-- **发表论文 / 学术会议** keep APA punctuation with Chinese content: `, . : ; ( )`
+- **学术发表 / 会议宣读** keep APA punctuation with Chinese content: `, . : ; ( )`
   instead of `，。：；（）`, `\textit{}` instead of `《》`, periods inside closing
   quotes, and `\&` before the final author in Chinese reference entries.
 - **All other sections** use normal full-width Chinese punctuation
