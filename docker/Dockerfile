@@ -16,7 +16,8 @@ FROM alpine:3.22
 
 ENV PATH="/opt/texlive/bin/x86_64-linuxmusl:${PATH}"
 
-# bash/perl: latexmk; fontconfig: latex-action's extra_fonts runs fc-cache for
+# bash/perl: latexmk; git: latex-action's entrypoint runs `git config
+# --system --add safe.directory`; fontconfig: latex-action's extra_fonts runs fc-cache for
 # family-name font lookups (Noto Serif CJK SC); file: install-tl's platform
 # detection; curl/tar/xz: fetching and unpacking the installer.
 RUN apk --no-cache add \
@@ -24,6 +25,7 @@ RUN apk --no-cache add \
         curl \
         file \
         fontconfig \
+        git \
         perl \
         tar \
         xz
