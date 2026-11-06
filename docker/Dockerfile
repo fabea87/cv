@@ -38,9 +38,13 @@ RUN set -eux; \
         -o /tmp/install-tl-unx.tar.gz.sha512; \
     ( cd /tmp && sha512sum -c install-tl-unx.tar.gz.sha512 ); \
     tar -xzf /tmp/install-tl-unx.tar.gz -C /tmp; \
-    TEXLIVE_INSTALL_ENV_NOCHECK=1 /tmp/install-tl-*/install-tl \
+    # mirror.ctan.org rotates across mirrors on every request, and any single
+    # mirror can be flaky, so retry the network-bound installer steps.
+    retry() { i=1; while [ "$i" -le 5 ]; do if "$@"; then return 0; fi; \
+        echo "attempt $i of '$*' failed, retrying in 5s"; i=$((i+1)); sleep 5; done; return 1; }; \
+    retry env TEXLIVE_INSTALL_ENV_NOCHECK=1 /tmp/install-tl-*/install-tl \
         -scheme scheme-basic -profile /tmp/texlive.profile; \
-    tlmgr install \
+    retry tlmgr install \
         fontspec xecjk csquotes babel-english microtype datetime fmtcount \
         tabto-ltx hyperref geometry enumitem needspace setspace xcolor \
         fontawesome5 academicons fancyhdr lastpage booktabs latexmk lm; \
