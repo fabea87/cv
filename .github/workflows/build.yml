@@ -91,26 +91,29 @@ jobs:
           # of the ~4 GB full texlive-alpine scheme. Digest-pinned for
           # reproducible builds; refresh by re-pinning after a docker-image.yml
           # run (or replace the digest with :latest to always track it).
-          docker_image: ghcr.io/fabea87/cv-texlive@sha256:73719820b4a0d77c5d51002ca6a2844fef4620df37893964f3ecf93e6b5227da
+          docker_image: ghcr.io/fabea87/cv-texlive@sha256:df6a6ce58942b8e29fdfe9960684ef4a3a75276c8fc66cc46a6fea92ad44dbc6
           extra_fonts: |
             fonts/*.ttf
             .fonts/*.ttf
             .fonts/*.otf
+          # Font verification runs inside the container via pdffonts (baked into
+          # the image), because recent ubuntu-latest images no longer preinstall
+          # poppler-utils and the per-run apt install cost ~70s. Output is
+          # written to a file first: the container entrypoint sets pipefail, and
+          # `pdffonts | grep -q` would otherwise misreport a SIGPIPE (141) as a
+          # failed match.
+          post_compile: |
+            pdffonts CV-cn.pdf > /tmp/cv-cn-fonts.txt
+            cat /tmp/cv-cn-fonts.txt
+            grep -qi 'HuiwenZhengkai' /tmp/cv-cn-fonts.txt \
+              || { echo "::error::CV-cn.pdf does not embed Huiwen ZhengKai -- CJK headings are wrong."; exit 1; }
+            grep -qi 'NotoSerifCJKsc' /tmp/cv-cn-fonts.txt \
+              || { echo "::error::CV-cn.pdf does not embed Noto Serif CJK SC -- CJK body text is wrong."; exit 1; }
+            # No trace of the removed fallback face.
+            if grep -qi 'FZYTK' /tmp/cv-cn-fonts.txt; then
+              echo "::error::CV-cn.pdf still embeds the retired FZYTK fallback face."; exit 1
+            fi
 
-      - name: Verify Chinese CV uses Huiwen ZhengKai
-        run: |
-          # A missing or mis-named CJK heading face would otherwise only show up as
-          # a wrong-looking PDF, so assert on the fonts actually embedded in it.
-          command -v pdffonts >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils; }
-          pdffonts CV-cn.pdf
-          pdffonts CV-cn.pdf | grep -qi 'HuiwenZhengkai' \
-            || { echo "::error::CV-cn.pdf does not embed Huiwen ZhengKai -- CJK headings are wrong."; exit 1; }
-          pdffonts CV-cn.pdf | grep -qi 'NotoSerifCJKsc' \
-            || { echo "::error::CV-cn.pdf does not embed Noto Serif CJK SC -- CJK body text is wrong."; exit 1; }
-          # No trace of the removed fallback face.
-          if pdffonts CV-cn.pdf | grep -qi 'FZYTK'; then
-            echo "::error::CV-cn.pdf still embeds the retired FZYTK fallback face."; exit 1
-          fi
 
       - name: Upload PDF artifacts
         uses: actions/upload-artifact@v4
