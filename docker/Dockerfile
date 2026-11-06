@@ -19,7 +19,9 @@ ENV PATH="/opt/texlive/bin/x86_64-linuxmusl:${PATH}"
 # bash/perl: latexmk; git: latex-action's entrypoint runs `git config
 # --system --add safe.directory`; fontconfig: latex-action's extra_fonts runs fc-cache for
 # family-name font lookups (Noto Serif CJK SC); file: install-tl's platform
-# detection; curl/tar/xz: fetching and unpacking the installer.
+# detection; curl/tar/xz: fetching and unpacking the installer; poppler-utils:
+# pdffonts, used by the post_compile font verification (recent ubuntu-latest
+# images no longer preinstall it on the host).
 RUN apk --no-cache add \
         bash \
         curl \
@@ -27,6 +29,7 @@ RUN apk --no-cache add \
         fontconfig \
         git \
         perl \
+        poppler-utils \
         tar \
         xz
 
