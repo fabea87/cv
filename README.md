@@ -53,10 +53,15 @@ PDF outputs are automatically compiled via GitHub Actions with XeLaTeX, deployed
 
 ### Chinese punctuation
 
-`CV-cn.tex` follows APA punctuation with Chinese content: `, . : ; ( )` instead of
-`，。：；（）`, `\textit{}` instead of `《》`, periods inside closing quotes, and `\&`
-before the final author in Chinese reference entries. CJK italics use `FakeSlant`
-(Noto Serif CJK has no italic face).
+Punctuation is scoped by section:
+
+- **发表论文 / 学术会议** keep APA punctuation with Chinese content: `, . : ; ( )`
+  instead of `，。：；（）`, `\textit{}` instead of `《》`, periods inside closing
+  quotes, and `\&` before the final author in Chinese reference entries.
+- **All other sections** use normal full-width Chinese punctuation
+  `，。：；、（）《》` (including the footer).
+
+CJK italics use `FakeSlant` (Noto Serif CJK has no italic face).
 
 ## Local Compilation
 
