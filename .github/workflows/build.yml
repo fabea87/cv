@@ -91,7 +91,7 @@ jobs:
           # of the ~4 GB full texlive-alpine scheme. Digest-pinned for
           # reproducible builds; refresh by re-pinning after a docker-image.yml
           # run (or replace the digest with :latest to always track it).
-          docker_image: ghcr.io/fabea87/cv-texlive@sha256:31a9909732820b208c54a410b16973f4b591e632b172a66737d7e125f1a72a5d
+          docker_image: ghcr.io/fabea87/cv-texlive@sha256:73719820b4a0d77c5d51002ca6a2844fef4620df37893964f3ecf93e6b5227da
           extra_fonts: |
             fonts/*.ttf
             .fonts/*.ttf
