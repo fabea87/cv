@@ -4,20 +4,19 @@
 % Web: https://870603.xyz
 % Repo: https://github.com/fabea87/cv
 
-\documentclass[12pt,a4paper]{report}
+\documentclass[11pt,a4paper]{article}
 
 \usepackage{fontspec}
 \usepackage{xeCJK}
 \usepackage[english]{babel}
 \usepackage{csquotes}
 \usepackage{microtype}
-\usepackage{datetime}
-\usepackage{hyperref}
 \usepackage{geometry}
 \usepackage{enumitem}
 \usepackage{needspace}
 \usepackage{setspace}
 \usepackage[dvipsnames,table]{xcolor}
+\usepackage{multicol}
 \usepackage{graphicx}
 \usepackage{fontawesome5}
 \usepackage{academicons}
@@ -25,11 +24,12 @@
 \usepackage{lastpage}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{hyperref} % load last for proper patching and PDF metadata
 
 % Accent color: Vibrant Royal Blue (#1A56B2)
 \definecolor{cvaccent}{HTML}{1A56B2}
 
-% select default typefaces
+% Select default Latin typeface
 \setmainfont{RobotoCondensed}[
   Path = fonts/,
   Extension = .ttf,
@@ -68,12 +68,13 @@
 % Single Regular weight, so fake bold supplies the \bfseries used by \namefont
 % and the section headings. The TTF is NOT in git (personal-use licence, no
 % redistribution), so it must be supplied at build time: locally by dropping
-% fonts/HuiwenZhengKai.ttf into place, in CI by the HUIWEN_FONT_B64 secret.
+% fonts/HuiwenZhengKai.ttf into place, in CI by decrypting assets/HuiwenZhengKai.ttf.gz.enc
+% with the HUIWEN_FONT_KEY repository secret.
 % There is deliberately NO fallback font -- a missing file is a hard error.
 \IfFileExists{fonts/HuiwenZhengKai.ttf}{}{%
   \errmessage{*** CV-cn.tex requires fonts/HuiwenZhengKai.ttf (\string\cjkheadingfont)
     -- 汇文正楷 is not distributed with this repo. Place the TTF in fonts/ (local)
-    or set the HUIWEN_FONT_B64 repository secret (CI). ***}%
+    or set the HUIWEN_FONT_KEY repository secret (CI). ***}%
 }
 \newCJKfontfamily\cjkheadingfont{HuiwenZhengKai}[
   Path = fonts/,
@@ -81,35 +82,46 @@
   AutoFakeBold = 2.0
 ]
 
-% what is your name?
+% Document author name
 \newcommand{\myname}{闫\hspace{0.5em}达\texorpdfstring{\Large{ 博士}}{ 博士}}
 
-% how far to tab for list items with left-aligned date
-\newcommand{\listtabwidth}{1.7cm}
+% Left column width for date/degree labels (aligned with section rule)
+\newcommand{\listtabwidth}{1.65cm}
 
-% define font to use as document's title
+% Title typeface
 \newcommand{\namefont}[1]{{\cjkheadingfont\bfseries\Huge\color{cvaccent}{#1}}}
 
-% set page margins
-\geometry{left=0.62in, right=0.58in, top=0.50in, bottom=0.50in}
+% Page margins (A4 paper)
+\geometry{
+  left=0.60in,
+  right=0.58in,
+  top=0.48in,
+  bottom=0.54in,
+  headheight=14pt,
+  footskip=20pt
+}
 
-% prevent paragraph indentation
+% Prevent paragraph indentation
 \setlength\parindent{0em}
 
-% set line spacing
-\setstretch{0.82}
+% Balanced line spacing for 11pt CJK + Latin
+\setstretch{1.02}
 
-% define space between list items
-\newcommand{\listitemspace}{0.12em}
+% Space between list items
+\newcommand{\listitemspace}{0.14em}
 
-% right-aligned publication tag
-\newcommand{\pubtag}[1]{\hspace*{\fill}\mbox{(#1)}}
+% Right-aligned publication/indexing tag (uses \hfill to beat \raggedright's 1fil)
+\newcommand{\pubtag}[1]{%
+  \unskip\nobreak\hfill\penalty50\hskip0.8em\hbox{}\nobreak\hfill
+  \mbox{\small\color{black!65}(#1)}%
+  {\parfillskip=0pt\finalhyphendemerits=0\endgraf}%
+}
 
-% Thoughteer-inspired section heading: colored flanking lines + heading
+% Section heading: Royal Blue flanking rules + numbered Huiwen ZhengKai title
 \newcounter{cvsection}
 \newcommand{\cvsection}[1]{%
   \Needspace{6\baselineskip}%
-  \par\vspace{10pt plus 2pt minus 2pt}%
+  \par\vspace{9pt plus 2pt minus 2pt}%
   \refstepcounter{cvsection}%
   \noindent
   \textcolor{cvaccent}{%
@@ -119,21 +131,21 @@
     \hspace{0.6em}%
     \leaders\hrule height \dimexpr 0.55ex + 0.85pt\relax depth -0.55ex\hfill\kern0pt
   }\par
-  \vspace{0.25em}%
   \nopagebreak
+  \vspace{0.20em}%
 }
 
-% make unordered lists without bullets and use compact spacing
+% Unordered lists without bullets and with compact spacing
 \renewenvironment{itemize}
 {
   \begin{list}{}{\setlength{\leftmargin}{0em}
       \setlength{\parskip}{0em}
       \setlength{\itemsep}{\listitemspace}
-  \setlength{\parsep}{\listitemspace}}}
+      \setlength{\parsep}{\listitemspace}}}
   {
 \end{list}}
 
-% make lists with consistent hanging indent
+% Consistent hanging-indent lists aligned to \listtabwidth
 \newlist{tablist}{description}{3}
 \setlist[tablist]{%
   leftmargin=\listtabwidth,
@@ -148,44 +160,44 @@
   font=\normalfont
 }
 
-% make compact enumerated lists
-\setlist[enumerate]{topsep=0.10em, partopsep=0em, itemsep=\listitemspace, parsep=\listitemspace, leftmargin=1.6em, font=\normalfont}
+% Compact enumerated lists
+\setlist[enumerate]{topsep=0.12em, partopsep=0em, itemsep=\listitemspace, parsep=\listitemspace, leftmargin=1.5em, font=\normalfont}
 
-% date format
+% Date format
 \newcommand{\edittoday}{\number\year 年\number\month 月}
 
-% define hyperlink appearance and metadata for pdf properties
+% Hyperlink appearance and PDF metadata
 \hypersetup{
   colorlinks   = true,
   urlcolor     = cvaccent,
   citecolor    = black,
   linkcolor    = cvaccent,
   pdfauthor    = {闫达},
-  pdfkeywords  = {应用语言学, 翻译学, 形成性评估, 计算机辅助教学, 人工智能},
+  pdfkeywords  = {应用语言学, 翻译学, 形成性评估, 计算机辅助教学, 人工智能, 人机交互},
   pdftitle     = {闫达：个人简历},
   pdfsubject   = {个人简历},
   pdfpagemode  = UseNone
 }
 
-% page footer with update date, name and page numbers
+% Page footer with update date, name, and page numbers
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot[L]{\footnotesize\color{black!70}更新时间：\edittoday}
-\fancyfoot[R]{\footnotesize\color{black!70}闫达 --- 第 \thepage{} / \pageref{LastPage} 页}
+\fancyfoot[R]{\footnotesize\color{black!70}闫达 --- 第 \thepage{} / \pageref*{LastPage} 页}
 
 \begin{document}
-\raggedright{}
+\raggedright
 
-% display your name, institution, contact info and photo
-\begin{minipage}[t]{0.73\textwidth}
+% Header: name, institution, contact info, and portrait
+\begin{minipage}[t]{0.75\textwidth}
   \vspace{0pt}%
-  \namefont{\myname}\\[0.40em]
-  {\normalsize\faUniversity\hspace{0.35em}温州医科大学}\\[0.22em]
-  {\normalsize\faBuilding[regular]\hspace{0.4em}外国语学院}\\[0.50em]
+  \namefont{\myname}\\[0.38em]
+  {\normalsize\faUniversity\hspace{0.35em}温州医科大学}\\[0.20em]
+  {\normalsize\faBuilding[regular]\hspace{0.42em}外国语学院}\\[0.48em]
   \href{mailto:alexyan1987@outlook.com}{\faEnvelope[regular]\hspace{0.4em}alexyan1987@outlook.com}\hspace{1.4em}%
-  \href{mailto:yanda@wmu.edu.cn}{\faEnvelope[regular]\hspace{0.4em}yanda@wmu.edu.cn}\\[0.30em]
-  \href{tel:+8618569800613}{\faWhatsapp\hspace{0.4em}+86 185 6980 0613}\hspace{1.4em}%
+  \href{mailto:yanda@wmu.edu.cn}{\faEnvelope[regular]\hspace{0.4em}yanda@wmu.edu.cn}\\[0.28em]
+  \href{tel:+8618569800613}{\faPhone*\hspace{0.4em}+86 185 6980 0613}\hspace{1.4em}%
   \href{https://870603.xyz}{\faGlobe\hspace{0.35em}870603.xyz}\hspace{1.4em}%
   {\normalsize%
     \href{https://orcid.org/0000-0002-1265-9772}{\aiOrcid}\hspace{0.35em}%
@@ -194,11 +206,10 @@
     \href{https://www.scopus.com/authid/detail.uri?authorId=57192956833}{\aiScopus}%
   }
 \end{minipage}\hfill
-\begin{minipage}[t]{0.24\textwidth}
+\begin{minipage}[t]{0.22\textwidth}
   \vspace{0pt}%
   \raggedleft
-  % keep a 1cm gap on the right so the portrait sits further left
-  \includegraphics[width=2.55cm, height=3.35cm, keepaspectratio]{photo_up.png}\hspace*{1cm}%
+  \includegraphics[width=2.55cm, height=3.35cm, keepaspectratio]{photo_cv.jpg}%
 \end{minipage}
 
 \cvsection{教育背景}
@@ -220,7 +231,7 @@
 
 \cvsection{研究方向}
 
-\begin{enumerate}[itemsep=0.04em, parsep=0.04em, topsep=0.08em]
+\begin{enumerate}[itemsep=0.06em, parsep=0.04em, topsep=0.08em]
   \item \textbf{应用语言学}与外语教学法。
   \item \textbf{计算机辅助语言学习}与口笔译技术培训。
   \item 二语习得中的教学与\textbf{形成性反馈}。
@@ -229,8 +240,10 @@
 
 \cvsection{学术发表}
 
+{\footnotesize\color{black!65}* 表示合著论文通讯作者；期刊分区标注均为 Clarivate JCR 分区。}\\[0.30em]
+
 \begin{tablist}
-\item[2026] \textbf{Yan, D.*} Metacognitive instruction to enhance EFL writers' metacognition, feedback uptake, and revision performance in a GenAI-assisted feedback context. \textit{International Journal of Applied Linguistics}. Advance online publication.~\href{https://doi.org/10.1111/ijal.70328}{\aiDoi} \pubtag{SSCI一区}
+\item[2026] \textbf{Yan, D.} Metacognitive instruction to enhance EFL writers' metacognition, feedback uptake, and revision performance in a GenAI-assisted feedback context. \textit{International Journal of Applied Linguistics}. Advance online publication.~\href{https://doi.org/10.1111/ijal.70328}{\aiDoi} \pubtag{SSCI一区}
 
 \item[2026] \textbf{Yan, D.*}, Kasuma, S. A. A., \& Amini, M. Revisiting dialogic feedback in the age of GenAI: An investigation into L2 writers' feedback seeking interactions. In \textit{Generative AI in Education: Theories, Applications, and Ethical Frontiers} (pp. 261--281). Springer.~\href{https://doi.org/10.1007/978-981-95-4871-2_14}{\aiDoi} \pubtag{图书章节}
 
@@ -242,7 +255,7 @@
 
 \item[2025] \textbf{Yan, D.*}, Jia, C., \& Tian, F. Automated feedback complements online dialogic peer feedback: Fostering L2 writers' feedback quality and self-regulatory writing strategy use. \textit{Interactive Learning Environments}, \textit{33}(10), 6021--6035.~\href{https://doi.org/10.1080/10494820.2025.2491620}{\aiDoi} \pubtag{SSCI一区}
 
-\item[2025] \textbf{Yan, D.}, \& Jia, C.* Occupational stress and turnover intentions among simultaneous interpreters: The mediating role of burnout and the moderating role of grit. \textit{Perspectives: Studies in Translation Theory and Practice}, \textit{34}(5), 1025--1040.~\href{https://doi.org/10.1080/0907676X.2025.2478403}{\aiDoi} \pubtag{A\&HCI, SSCI二区}
+\item[2025] \textbf{Yan, D.}, \& Jia, C.* Occupational stress and turnover intentions among simultaneous interpreters: The mediating role of burnout and the moderating role of grit. \textit{Perspectives: Studies in Translation Theory and Practice}, \textit{34}(5), 1025--1040.~\href{https://doi.org/10.1080/0907676X.2025.2478403}{\aiDoi} \pubtag{SSCI二区, A\&HCI}
 
 \item[2024] \textbf{Yan, D.} Comparing individual vs. collaborative processing of ChatGPT-generated feedback: Effects on L2 writing task improvement and learning. \textit{Language Learning \& Technology}, \textit{28}(1), 1--19.~\href{https://doi.org/10.64152/10125/73597}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SSCI一区}
 
@@ -252,7 +265,7 @@
 
 \item[2024] \textbf{Yan, D.} Feedback seeking abilities of L2 writers using ChatGPT: A mixed method multiple case study. \textit{Kybernetes}, \textit{54}(7), 3757--3781.~\href{https://doi.org/10.1108/K-09-2023-1933}{\aiDoi} \pubtag{SCI二区}
 
-\item[2023] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. Gender difference in digital literacy among translation trainees: Self-perceptions and application abilities. \textit{International Journal of Academic Research in Progressive Education and Development}, \textit{12}(3), 2393--2899.~\href{https://doi.org/10.6007/IJARPED/v12-i3/19611}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{ERA}
+\item[2023] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. Gender difference in digital literacy among translation trainees: Self-perceptions and application abilities. \textit{International Journal of Academic Research in Progressive Education and Development}, \textit{12}(3), 2372--2388.~\href{https://doi.org/10.6007/IJARPED/v12-i3/19611}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{ERA}
 
 \item[2023] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. Status quo of the formative assessment enactments in spoken language interpreter training: A scoping review of research and practice. \textit{International Journal of Academic Research in Progressive Education and Development}, \textit{12}(4), 652--673.~\href{https://doi.org/10.6007/IJARPED/v12-i4/19884}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{ERA}
 
@@ -266,7 +279,7 @@
 
 \item[2022] \textbf{Yan, D.} Review of the book \textit{Cognitive bases of second language fluency}, Norman Segalowitz (Ed.). \textit{Porta Linguarum}, \textit{38}.~\href{https://doi.org/10.30827/portalin.vi38.23934}{\aiOpenAccess\hspace{0.25em}\aiDoi} \pubtag{SSCI二区, 书评}
 
-\item[2018] 杨明星, 吴丽华, 牛桂玲, \& \textbf{闫达}. “互联网+”背景下多模态, 多语种外交话语平行语料库设计与创建探析. \textit{外语教学}, \textit{39}(6), 13--19. \pubtag{CSSCI}
+\item[2018] 杨明星, 吴丽华, 牛桂玲, \& \textbf{闫达}. “互联网+”背景下多模态、多语种外交话语平行语料库设计与创建探析. \textit{外语教学}, \textit{39}(6), 13--19. \pubtag{CSSCI}
 
 \item[2016] Yang, M., \& \textbf{Yan, D.} The translation strategies for Chinese diplomatic neologisms from the perspective of ``Political Equivalence''. \textit{Babel}, \textit{62}(4), 661--675.~\href{https://doi.org/10.1075/babel.62.4.07yan}{\aiDoi} \pubtag{SSCI三区, A\&HCI}
 
@@ -280,24 +293,24 @@
 \begin{tablist}
 \item[2026] \textbf{闫达}. “Towards Hybrid Intelligent Feedback in EFL Writing: A Qualitative Inquiry into GenAI-Augmented Peer Dialogue and Co-Regulated Learning.” 第十五届外语写作教学与研究国际研讨会, 中国人民大学, 北京.
 
-\item[2025] \textbf{闫达}. “当中医药翻译遇上生成式人工智能: \textit{黄帝内经}英译人机交互中的‘分歧-趋同-惊喜’.” 第五届中医药文化翻译与国际传播学术研讨会, 温州医科大学, 12月05--07日.
-
 \item[2025] \textbf{闫达}. “打破边界与重塑范式: 新时代背景下的翻译研究新图景.” 温州医科大学外国语学院学者学术沙龙, 12月24日.
 
-\item[2025] \textbf{闫达}. “从‘能动性之舞’到共生: 生成式AI下的译者主动性.” 温州市翻译协会学术年会, 11月21日.
+\item[2025] \textbf{闫达}. “当中医药翻译遇上生成式人工智能: \textit{黄帝内经}英译人机交互中的‘分歧-趋同-惊喜’.” 第五届中医药文化翻译与国际传播学术研讨会, 温州医科大学, 12月05--07日.
+
+\item[2025] \textbf{闫达}. “从‘能动性之舞’到共生: 生成式AI下的译者主动性.” 温州市翻译协会学术年会, 温州理工学院, 11月22日.
 
 \item[2025] \textbf{闫达}. “生成式人工智能视野下跨文化及语言传播译介的机遇与挑战.” 高校国别和区域研究人才培养与学科建设联盟第七届年会, 浙江工业大学, 10月31日--11月02日.
 
-\item[2023] \textbf{Yan, D.} \enquote{L2 Writers' Feedback-Seeking from ChatGPT for Automated Written Corrective Feedback: Insights from a Multiple Case Study}. 第六届国际研究生学术研讨会, 马来西亚理科大学, 12月12--13日.
+\item[2023] \textbf{Yan, D.} \enquote{L2 Writers' Feedback-Seeking from ChatGPT for Automated Written Corrective Feedback: Insights from a Multiple Case Study.} 第六届国际研究生学术研讨会, 马来西亚理科大学, 12月12--13日.
 
-\item[2023] \textbf{Yan, D.} \enquote{Unpacking L2 Writer's Feedback Processing in an Innovative Learning Environment Empowered by ChatGPT}. 研究生学术研讨会(PGRC 2023), 泰莱大学, 11月03--04日.
+\item[2023] \textbf{Yan, D.} \enquote{Unpacking L2 Writer's Feedback Processing in an Innovative Learning Environment Empowered by ChatGPT.} 研究生学术研讨会 (PGRC 2023), 泰莱大学, 11月03--04日.
 
-\item[2022] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. \enquote{Gender Difference in Digital Literacy Among Translation Trainees}. 亚太语言与性别学术研讨会, 马来西亚理科大学, 08月11--12日.
+\item[2022] \textbf{Yan, D.}, Kasuma, S. A. A., \& Amini, M. \enquote{Gender Difference in Digital Literacy Among Translation Trainees.} 亚太语言与性别学术研讨会, 马来西亚理科大学, 08月11--12日.
 \end{tablist}
 
 \cvsection{主持科研项目}
 
-\begin{tablist}[itemsep=0.08em, parsep=0.08em]
+\begin{tablist}[itemsep=0.10em, parsep=0.08em]
 \item[2026] 浙江高校外语专业人机协同教学阻滞与优化路径研究，\textbf{浙江省哲学社会科学规划课题}
 
 \item[2026] 生成式人工智能赋能课堂形成性评估中的认知外包风险及防范策略研究，\textbf{温州市科技项目}
@@ -329,36 +342,11 @@
 \item[2014] 构建基于语料库的英汉互译自动评分系统辅助高校翻译教学，\textbf{信阳市社科联调研课题}
 \end{tablist}
 
-\cvsection{讲授课程}
-
-\noindent
-{\normalsize\renewcommand{\arraystretch}{1.08}%
-\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}ccc@{}}
-  \textbf{课程名称} & \textbf{开课学校} & \textbf{课程代码} & \textbf{开课年份} \\
-  \hline
-  \addlinespace[0.25em]
-  通用医学英语 II & 温州医科大学 & NN220320 & 2026 \\
-  通用医学英语 I & 温州医科大学 & NN220318 & 2025 \\
-  英语写作 I & 温州医科大学 & NN220168 & 2025 \\
-  大学英语 1 & 温州医科大学 & NN220315 & 2025 \\
-  国际商务函电 & 温州医科大学 & NN220367 & 2025 \\
-  基础口译 & 信阳农林学院 & B0632007 & 2017--2024 \\
-  高级口译 & 信阳农林学院 & 06063017 & 2020--2024 \\
-  计算机辅助翻译 & 信阳农林学院 & 06062036 & 2020--2024 \\
-  翻译概论 & 信阳农林学院 & 07008 & 2013--2023 \\
-  专业英语选读 & 信阳农林学院 & 06063097 & 2018--2020 \\
-  英语写作 & 信阳农林学院 & 16032 & 2016--2019 \\
-  英语阅读 & 信阳农林学院 & 06062016 & 2016--2019 \\
-  商务谈判 & 信阳农林学院 & 07030 & 2014 \\
-  大学英语 & 信阳农林学院 & 07004 & 2013 \\
-  英语语法 & 信阳农林学院 & 07049 & 2013 \\
-\end{tabular*}}
-
 \cvsection{荣誉奖励}
 
-\begin{tablist}[itemsep=0.06em, parsep=0.06em]
+\begin{tablist}[itemsep=0.08em, parsep=0.06em]
 \item[2026] 全球前 2\% 顶尖科学家榜单 \pubtag{斯坦福大学 / 爱思唯尔}
-\item[2026] 外国语学院年度科研业绩奖 \pubtag{温州医科大学外国语学院}
+\item[2026] 2025年度外国语学院科研业绩奖 \pubtag{温州医科大学外国语学院}
 \item[2026] 青年教师助讲培养考核优秀 \pubtag{温州医科大学}
 \item[2020] 全国翻译技术教学大赛华中大区赛二等奖 \pubtag{世界翻译教育联盟 / 广外高翻学院}
 \item[2020] 优秀教师 \pubtag{信阳农林学院}
@@ -371,6 +359,32 @@
 \item[2014] 优秀班主任 \pubtag{信阳农林学院}
 \end{tablist}
 
+\cvsection{讲授课程}
+
+\noindent
+{\normalsize\renewcommand{\arraystretch}{1.08}%
+\begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}ccc@{}}
+  \textbf{课程名称} & \textbf{开课学校} & \textbf{课程代码} & \textbf{开课年份} \\
+  \midrule
+  通用医学英语 II & 温州医科大学 & NN220320 & 2026 \\
+  通用医学英语 I & 温州医科大学 & NN220318 & 2025 \\
+  英语写作 I & 温州医科大学 & NN220168 & 2025 \\
+  大学英语 1 & 温州医科大学 & NN220315 & 2025 \\
+  国际商务函电 & 温州医科大学 & NN220367 & 2025 \\
+  \addlinespace[0.35em]
+  基础口译 & 信阳农林学院 & B0632007 & 2017--2024 \\
+  高级口译 & 信阳农林学院 & 06063017 & 2020--2024 \\
+  计算机辅助翻译 & 信阳农林学院 & 06062036 & 2020--2024 \\
+  翻译概论 & 信阳农林学院 & 07008 & 2013--2023 \\
+  专业英语选读 & 信阳农林学院 & 06063097 & 2018--2020 \\
+  英语写作 & 信阳农林学院 & 16032 & 2016--2019 \\
+  英语阅读 & 信阳农林学院 & 06062016 & 2016--2019 \\
+  商务谈判 & 信阳农林学院 & 07030 & 2014 \\
+  大学英语 & 信阳农林学院 & 07004 & 2013 \\
+  英语语法 & 信阳农林学院 & 07049 & 2013 \\
+  \bottomrule
+\end{tabular*}}
+
 \cvsection{社会服务}
 
 \begin{enumerate}[itemsep=0.10em, parsep=0.08em, topsep=0.08em]
@@ -382,63 +396,65 @@
 
 \cvsection{学术服务}
 
-\vspace{0.2em}
 \noindent\textbf{期刊编委与学术编辑：}
-\begin{enumerate}[itemsep=0.05em, parsep=0.05em, topsep=0.08em]
+\begin{enumerate}[itemsep=0.06em, parsep=0.05em, topsep=0.10em]
   \item \textit{Scientific Reports} 编委 \pubtag{SCI：综合}
-  \item \textit{Humanities \& Social Sciences Communications} 编委 \pubtag{SSCI：社科综合}
-  \item \textit{PLoS One} 学术编辑 \pubtag{SCI：综合}
+  \item \textit{Humanities and Social Sciences Communications} 编委 \pubtag{SSCI：社科综合}
+  \item \textit{PLOS ONE} 学术编辑 \pubtag{SCI：综合}
 \end{enumerate}
 
 \vspace{0.25em}
-\noindent\textbf{特邀同行评审专家：}
-\begin{enumerate}[itemsep=0.05em, parsep=0.05em, topsep=0.08em]
+\noindent\textbf{特邀同行评审专家} {\small\color{black!65}（涵盖语言学、教育学、翻译学、传播学、心理学与综合类共 38 种期刊）：}
+\setlength{\multicolsep}{3pt}
+\setlength{\columnsep}{1.6em}
+\begin{multicols}{2}
+\small
+\begin{itemize}
+  \setlength{\itemsep}{0.05em}
+  \setlength{\parsep}{0em}
   % Linguistics
-  \item Asian-Pacific Journal of Second and Foreign Language Education \pubtag{ESCI：语言学}
-  \item Assessing Writing \pubtag{SSCI：语言学}
-  \item Computer Assisted Language Learning \pubtag{SSCI：语言学}
-  \item ELT Journal \pubtag{SSCI：语言学}
-  \item Forum for Linguistic Studies \pubtag{Scopus：语言学}
-  \item Innovation in Language Learning and Teaching \pubtag{SSCI：语言学}
-  \item International Journal of Applied Linguistics \pubtag{SSCI：语言学}
-  \item International Review of Applied Linguistics in Language Teaching \pubtag{SSCI：语言学}
-  \item Journal of Second Language Writing \pubtag{SSCI：语言学}
-  \item Language Learning \& Technology \pubtag{SSCI：语言学}
-  \item Language Teaching Research \pubtag{SSCI：语言学}
-  \item ReCALL \pubtag{SSCI：语言学}
-  \item RELC Journal \pubtag{SSCI：语言学}
-  \item Research Methods in Applied Linguistics \pubtag{Scopus：语言学}
-  \item SYSTEM \pubtag{SSCI：语言学}
-  \item TESOL Quarterly \pubtag{SSCI：语言学}
-  % Education
-  \item Cogent Education \pubtag{Scopus：教育学}
-  \item European Journal of Education \pubtag{SSCI：教育学}
-  \item Instructional Science \pubtag{SSCI：教育学}
-  \item International Journal of Computer-Supported Collaborative Learning \pubtag{SSCI：教育学}
-  \item International Journal of STEM Education \pubtag{SSCI：教育学}
-  \item International Journal of Sustainability in Higher Education \pubtag{SSCI：教育学}
-  \item Journal of Computer-assisted Learning \pubtag{SSCI：教育学}
-  \item npj Science of Learning \pubtag{SSCI：教育学}
-  \item Review of Education \pubtag{ESCI：教育学}
-  \item Studies in Educational Evaluation \pubtag{SSCI：教育学}
-  \item Studies in Higher Education \pubtag{SSCI：教育学}
-  % Educational technology
-  \item Information and Learning Science \pubtag{ESCI：教育技术}
-  % Translation studies
-  \item New Voices in Translation Studies \pubtag{Scopus：翻译学}
-  % Communication
-  \item Information, Communication and Society \pubtag{ESCI：传播学}
-  % Psychology
-  \item Discover Psychology \pubtag{ESCI：心理学}
-  \item Frontiers in Psychology \pubtag{SSCI：心理学、社科综合}
-  % Cybernetics
-  \item Kybernetes \pubtag{SCI：控制论、人机交互}
-  % Multidisciplinary
-  \item Humanities \& Social Sciences Communications \pubtag{SSCI：社科综合}
-  \item Journal of Infrastructure, Policy and Development \pubtag{ESCI：社科综合}
-  \item PLoS One \pubtag{SCI：综合}
-  \item SAGE Open \pubtag{SSCI：社科综合}
-  \item Scientific Reports \pubtag{SCI：综合}
-\end{enumerate}
+  \item \textit{Asian-Pacific Journal of Second and Foreign Language Education} {\footnotesize\color{black!65}(ESCI)}
+  \item \textit{Assessing Writing} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Computer Assisted Language Learning} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{ELT Journal} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Forum for Linguistic Studies} {\footnotesize\color{black!65}(Scopus)}
+  \item \textit{Innovation in Language Learning and Teaching} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{International Journal of Applied Linguistics} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{International Review of Applied Linguistics in Language Teaching} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Journal of Second Language Writing} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Language Learning \& Technology} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Language Teaching Research} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{ReCALL} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{RELC Journal} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Research Methods in Applied Linguistics} {\footnotesize\color{black!65}(ESCI)}
+  \item \textit{System} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{TESOL Quarterly} {\footnotesize\color{black!65}(SSCI)}
+  % Education & EdTech
+  \item \textit{Cogent Education} {\footnotesize\color{black!65}(Scopus)}
+  \item \textit{European Journal of Education} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Information and Learning Science} {\footnotesize\color{black!65}(ESCI)}
+  \item \textit{Instructional Science} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{International Journal of Computer-Supported Collaborative Learning} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{International Journal of STEM Education} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{International Journal of Sustainability in Higher Education} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Journal of Computer Assisted Learning} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{npj Science of Learning} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Review of Education} {\footnotesize\color{black!65}(ESCI)}
+  \item \textit{Studies in Educational Evaluation} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Studies in Higher Education} {\footnotesize\color{black!65}(SSCI)}
+  % Translation, Communication & Psychology
+  \item \textit{New Voices in Translation Studies} {\footnotesize\color{black!65}(Scopus)}
+  \item \textit{Information, Communication \& Society} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Discover Psychology} {\footnotesize\color{black!65}(ESCI)}
+  \item \textit{Frontiers in Psychology} {\footnotesize\color{black!65}(SSCI)}
+  % Cybernetics & Multidisciplinary
+  \item \textit{Kybernetes} {\footnotesize\color{black!65}(SCI)}
+  \item \textit{Humanities and Social Sciences Communications} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Journal of Infrastructure, Policy and Development} {\footnotesize\color{black!65}(ESCI)}
+  \item \textit{PLOS ONE} {\footnotesize\color{black!65}(SCI)}
+  \item \textit{SAGE Open} {\footnotesize\color{black!65}(SSCI)}
+  \item \textit{Scientific Reports} {\footnotesize\color{black!65}(SCI)}
+\end{itemize}
+\end{multicols}
 
 \end{document}
